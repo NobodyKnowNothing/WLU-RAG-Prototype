@@ -1,0 +1,97 @@
+[
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "What does a difference of a full order of magnitude typically signal when making an estimate?",
+    "answer_location": "Section 3.1 (Estimation), Page 2, specifically under the 'Mini rule-of-thumb'."
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "How is the range of possible values defined when establishing upper and lower bounds?",
+    "answer_location": "Section 3.2.2 (Range of Possible Values), Page 2."
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "If two numerical estimates fall within the same cycle on a logarithmic scale, what does this indicate about their relationship?",
+    "answer_location": "Section 3.6 (Logarithmic Scale), Page 10, designated under the 'Key idea'."
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "How should a student adjust their uncertainty if their best estimate does not fall exactly midway between their upper and lower bounds?",
+    "answer_location": "Section 3.7 (Uncertainties), Page 13, under step 2 of the 'IT4' instructions."
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "When utilizing scientific notation, why is it incorrect to write a value as 12 x 10^3?",
+    "answer_location": "Appendix A.2 (Scientific Notation), Page 18, under 'Common pitfalls'."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Who is the instructor for the course, and what is their email address?",
+    "answer_location": "At the very top of the document in the header section, just above the 'Description' heading."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What specific items are students required to bring with them to every lab session?",
+    "answer_location": "Under the 'Lab Format' section, located in the bulleted list directly below the phrase 'Students must bring the following to every lab session:'."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Is there a grace period for being late, or a cutoff time when students will no longer be admitted?",
+    "answer_location": "Under the 'Schedule' section, located in the third bullet point regarding punctuality."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What steps must a student take if they miss a lab due to illness, and what documentation is required?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Attendance and Makeup Policy' subheading in the list of valid reasons for absence."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "How long does a student have to dispute or ask questions about a grade once it has been posted?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Grade Review and Inquiry Policy' subheading in the second bullet point."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Are students allowed to use their laptops or cell phones during the lab?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Digital Devices & Participation Policy' subheading in the first and second bullet points."
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What happens if a student forgets to print and bring their lab manual?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Digital Devices & Participation Policy' subheading in the final long bullet point."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What materials are students required to bring to every tutorial session?",
+    "answer_location": "In the 'Introduction' section, under the 'Preparation and Materials' subheading."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "Are students allowed to use cell phones, laptops, or other smart devices during the session?",
+    "answer_location": "In the 'Introduction' section, under the 'Digital Tools Policy' subheading."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What is the proper protocol and email address for communicating with the instructor?",
+    "answer_location": "In the 'Introduction' section, under the 'Communication' subheading."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "When and where are the instructor's office hours held?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Office Hours' subheading."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What specific resources are permitted during the open-book written tutorial reports?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Tutorial Format' subheading, specifically within the 'Permitted Resources' bulleted list."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "How much time do students have to raise concerns about their grades after a tutorial has been marked?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Attendance and Grading Policies' subheading, specifically at numbered point 18."
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What is the penalty for using unauthorized digital tools or AI-based systems during a tutorial?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Tutorial Format' subheading, in the paragraph immediately following the 'Permitted Resources' list."
+  }
+]
