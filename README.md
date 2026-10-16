@@ -1,54 +1,64 @@
 # WLU RAG Prototype
 
-Hybrid retrieval-augmented QA over the PC141 course PDFs in `files/`, ported from `RAG_Prototype.ipynb`.
+Question answering with citations over the PC141 course PDFs in `files/`.
 
-Pipeline:
+**Pipeline:**
 
-1. **Chunking**: per-page PDF text split into ~400-word chunks with 10% overlap (`rag_prototype/chunking.py`).
-2. **Semantic tagging**: each chunk gets a 1–2 sentence description from Gemma (`gemma-4-31b-it`, failing over to `gemma-4-26b-a4b-it` on quota exhaustion). The description is prepended to the chunk before embedding (`rag_prototype/tagging.py`).
-3. **Indexing**: dense vectors (`all-MiniLM-L6-v2`) in an on-disk Qdrant store, plus BM25 over the enriched text (`rag_prototype/index_store.py`).
-4. **Retrieval**: dense + BM25 fused with Reciprocal Rank Fusion (top 150), then reranked with a cross-encoder down to the top 5 (`rag_prototype/retriever.py`).
-5. **Answering**: Gemma answers using only those chunks and cites `[Cite: file, Page: n]` inline (`rag_prototype/qa.py`).
+1. Split each PDF page into chunks.
+2. Gemma (`gemma-4-31b-it`, with `gemma-4-26b-a4b-it` as fallback) writes a short description of each chunk.
+3. Index the chunks for search: embeddings (MiniLM) in Qdrant, plus BM25 keyword search.
+4. Merge both result lists with reciprocal rank fusion (RRF), then rerank them with a cross-encoder and keep the top 5.
+5. Gemma answers from those 5 chunks and cites them as `[Cite: file, Page: n]`.
 
 ## Setup
+
+Requires Python 3.10+ (tested on 3.12).
 
 ```bash
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 ```
 
-Put your key in `.env`:
+On macOS/Linux, use `.venv/bin/pip` instead. Then create a `.env` file containing your Gemini API key:
 
 ```
-GEMINI_API_KEY=...
+GEMINI_API_KEY=your-key
 ```
 
 ## Usage
 
 ```bash
-python -m rag_prototype index                     # index new/changed files in files/
+python -m rag_prototype run                                  # index + demo question + eval
+python -m rag_prototype index                                # index new/changed PDFs in files/
 python -m rag_prototype ask "Can I use my phone in the lab?" --show-sources
-python -m rag_prototype eval                      # runs data/eval_questions.json -> results/eval_results.json
-python -m rag_prototype run                       # index + demo question + eval
+python -m rag_prototype eval                                 # writes results/eval_results.json
 ```
 
-## Caching and incremental indexing
+## Caching
 
-Everything lives in `.rag_cache/`:
+The index is committed in `.rag_cache/`, so a fresh clone can answer questions straight away without re-tagging the PDFs:
 
-| Path | Contents |
+- Each PDF is identified by its SHA-256 hash. Unchanged PDFs are skipped, edited ones are re-processed, and deleted ones are removed from the index.
+- Gemma descriptions are saved after every call (`tags.json`), so an interrupted index run resumes where it stopped.
+- If the vector store is lost, it is rebuilt from the cached chunks without calling Gemma.
+- Changing the chunking, embedding model, Gemma model or tagging prompt in `rag_prototype/config.py` triggers a full rebuild. Cached descriptions are still reused where possible.
+
+To rebuild from scratch, delete `.rag_cache/`.
+
+## Results
+
+These are from indexing 4 PDFs (36 pages) into 36 chunks. Results are in `results/eval_results.json`.
+
+| Metric | Result |
 |---|---|
-| `manifest.json` | indexed files with their SHA-256 and chunk count |
-| `docs/<sha>_<fp>.json` | chunks, page numbers and LLM descriptions for each file version |
-| `tags.json` | LLM descriptions keyed by chunk hash. Written after every call, so an interrupted run resumes where it stopped. |
-| `qdrant/` | persistent Qdrant vector store |
+| Correct PDF in the top 5 results | **19/19** questions |
+| First index run, from empty cache | ~5 min |
+| Re-index with no changes | ~3 s, no Gemma calls |
 
-On each `index` run:
+Every answer cites its source, and the 19 answers agree with the expected answer locations. Two answers (Q10, Q14) also mention the matching lab or tutorial rule from the other PDF.
 
-- **Unchanged files** (same content hash) are skipped. This makes no LLM or embedding calls.
-- **New or modified files** are chunked, tagged and embedded. Vectors from the old version are deleted.
-- **Deleted files** have their vectors and cached chunks removed.
-- If the vector store is missing or out of sync, vectors are rebuilt from the cached chunks without calling the LLM.
-- If you change the chunking, embedding model or tagging model in `config.py`, the index is rebuilt. Descriptions for chunks that did not change are still reused from `tags.json`.
+**Caveats:**
 
-`index --force` re-processes every file but still reuses cached descriptions. To start completely fresh, delete `.rag_cache/`.
+- Cited page numbers are PDF page positions, not the numbers printed on the page. For example, "Page 2" in the printed lab manual is PDF page 6.
+- Gemma 4 calls take 20–70 s each and sometimes fail with 500/503 errors. The client fails over to the other model and retries.
+- Gemma's thinking is set to minimal. With the default setting, its hidden reasoning used up the reply's token limit and answers came back empty or cut off.

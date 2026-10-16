@@ -1,0 +1,648 @@
+[
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "What does a difference of a full order of magnitude typically signal when making an estimate?",
+    "answer_location": "Section 3.1 (Estimation), Page 2, specifically under the 'Mini rule-of-thumb'.",
+    "answer": "A difference of a full order of magnitude (a factor of 10) often signals faulty reasoning or a unit error [Cite: PC141labRAG.pdf, Page: 6].",
+    "retrieved": [
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 6,
+        "rerank_score": 3.91102933883667
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 11,
+        "rerank_score": -0.015947453677654266
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 14,
+        "rerank_score": -0.19186197221279144
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 18,
+        "rerank_score": -0.8717293739318848
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 13,
+        "rerank_score": -1.4836152791976929
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "How is the range of possible values defined when establishing upper and lower bounds?",
+    "answer_location": "Section 3.2.2 (Range of Possible Values), Page 2.",
+    "answer": "When upper and lower bounds are set, the range of possible values is defined as the difference between them [Cite: PC141labRAG.pdf, Page: 6].",
+    "retrieved": [
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 18,
+        "rerank_score": 4.182122707366943
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 6,
+        "rerank_score": 3.259721279144287
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 7,
+        "rerank_score": 2.506755828857422
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 8,
+        "rerank_score": 1.7379409074783325
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 16,
+        "rerank_score": 0.7241721153259277
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "If two numerical estimates fall within the same cycle on a logarithmic scale, what does this indicate about their relationship?",
+    "answer_location": "Section 3.6 (Logarithmic Scale), Page 10, designated under the 'Key idea'.",
+    "answer": "If two numbers fall within the same cycle of a logarithmic scale, it indicates that they are within one order of magnitude of each other [Cite: PC141labRAG.pdf, Page: 14].",
+    "retrieved": [
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 14,
+        "rerank_score": 4.969101905822754
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 16,
+        "rerank_score": 2.779456615447998
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 18,
+        "rerank_score": -0.5179980993270874
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 15,
+        "rerank_score": -1.1845537424087524
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 3,
+        "rerank_score": -2.244014263153076
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "How should a student adjust their uncertainty if their best estimate does not fall exactly midway between their upper and lower bounds?",
+    "answer_location": "Section 3.7 (Uncertainties), Page 13, under step 2 of the 'IT4' instructions.",
+    "answer": "If a student's best estimate ($\\hat{x}$) is not midway between the bounds, they should either (i) choose $\\Delta x = \\max\\{U-E, E-L\\}$ or (ii) adjust one bound to make the interval symmetric [Cite: PC141labRAG.pdf, Page: 17].",
+    "retrieved": [
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 17,
+        "rerank_score": 7.808835983276367
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 18,
+        "rerank_score": 1.482471227645874
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 16,
+        "rerank_score": 1.0641224384307861
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 7,
+        "rerank_score": 0.5580379962921143
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 8,
+        "rerank_score": -0.24299228191375732
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141labRAG.pdf",
+    "question": "When utilizing scientific notation, why is it incorrect to write a value as 12 x 10^3?",
+    "answer_location": "Appendix A.2 (Scientific Notation), Page 18, under 'Common pitfalls'.",
+    "answer": "It is incorrect to write a value as $12 \\times 10^3$ because the value $a$ in scientific notation ($N = a \\times 10^n$) must be kept in the range $[1, 10)$ [Cite: PC141labRAG.pdf, Page: 22]. Instead, the value should be written as $1.2 \\times 10^4$ [Cite: PC141labRAG.pdf, Page: 22].",
+    "retrieved": [
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 22,
+        "rerank_score": 1.990185022354126
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 11,
+        "rerank_score": -2.702397584915161
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 14,
+        "rerank_score": -5.158408164978027
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 16,
+        "rerank_score": -5.670811653137207
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 17,
+        "rerank_score": -6.529282569885254
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Who is the instructor for the course, and what is their email address?",
+    "answer_location": "At the very top of the document in the header section, just above the 'Description' heading.",
+    "answer": "The instructor for the course is Dr. Shodiev [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 1], and their email address is hshodiev@wlu.ca [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 1].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 1,
+        "rerank_score": -2.584324359893799
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -6.728210926055908
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": -7.562010288238525
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -8.386381149291992
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 4,
+        "rerank_score": -8.583368301391602
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What specific items are students required to bring with them to every lab session?",
+    "answer_location": "Under the 'Lab Format' section, located in the bulleted list directly below the phrase 'Students must bring the following to every lab session:'.",
+    "answer": "Students are required to bring the following items to every lab session:\n*   Lab manual [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 2] (specifically a printed copy [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4])\n*   Scientific calculator [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 2]\n*   Notebook [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 2]",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": 6.581827640533447
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": 2.7137184143066406
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": 2.585923671722412
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 4,
+        "rerank_score": 1.5084413290023804
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": 0.15292061865329742
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Is there a grace period for being late, or a cutoff time when students will no longer be admitted?",
+    "answer_location": "Under the 'Schedule' section, located in the third bullet point regarding punctuality.",
+    "answer": "Students arriving more than 10 minutes late may not be admitted [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 2].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -6.878201484680176
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -8.696130752563477
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 2,
+        "rerank_score": -8.78879165649414
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 5,
+        "rerank_score": -10.141510009765625
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -10.435787200927734
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What steps must a student take if they miss a lab due to illness, and what documentation is required?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Attendance and Makeup Policy' subheading in the list of valid reasons for absence.",
+    "answer": "If a student misses a lab due to illness, they must take the following steps:\n\n*   **Notification:** Email the instructor as soon as possible, preferably before the scheduled session [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3].\n*   **Follow-up:** All follow-up regarding the missed lab will be handled in person during the next lab or tutorial session [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3].\n*   **Documentation:** The student must provide documentation from a licensed medical professional or walk-in clinic [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3]. This documentation should be brought to the next lab or tutorial session and not sent via email, as sensitive medical information should not be emailed [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": 4.632014274597168
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": 1.9643652439117432
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -2.519932270050049
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": -4.2178120613098145
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 5,
+        "rerank_score": -8.665040016174316
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "How long does a student have to dispute or ask questions about a grade once it has been posted?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Grade Review and Inquiry Policy' subheading in the second bullet point.",
+    "answer": "Regarding tutorial grades, any concerns regarding marking or grade recording must be raised within one week of the work being marked [Cite: PC141tutorialRules.pdf, Page: 5]. \n\nRegarding lab grades, questions about grading must be raised within one week of a mark being posted [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3].",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -3.2794196605682373
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": -5.246455669403076
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -5.736362457275391
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 4,
+        "rerank_score": -6.722485542297363
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 1,
+        "rerank_score": -8.576865196228027
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "Are students allowed to use their laptops or cell phones during the lab?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Digital Devices & Participation Policy' subheading in the first and second bullet points.",
+    "answer": "No, students are not allowed to use laptops or cell phones during labs [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4]. Laboratory sessions are described as device-free environments where the use of cell phones, laptops, tablets, smart watches, or any electronic devices is not permitted and all devices must be turned off and stored away [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": 3.6801810264587402
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": 2.333408832550049
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -3.612949848175049
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -4.709754943847656
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 1,
+        "rerank_score": -6.741332054138184
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141LabSyllabus2026FRAG.pdf",
+    "question": "What happens if a student forgets to print and bring their lab manual?",
+    "answer_location": "Under the 'Requirements and Policies' section, specifically beneath the 'Digital Devices & Participation Policy' subheading in the final long bullet point.",
+    "answer": "If a student does not bring a printed copy of the assigned lab manual, they will receive a participation grade of -10 for that lab, which results in a 10% deduction from the total mark for that specific lab session [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4]. Printing or access issues, such as location constraints, last-minute printing, or printer failure, are not considered valid excuses [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": 1.0855791568756104
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -2.222537040710449
+      },
+      {
+        "source": "PC141labRAG.pdf",
+        "page": 19,
+        "rerank_score": -2.681658983230591
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -3.8687872886657715
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 4,
+        "rerank_score": -6.0715250968933105
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What materials are students required to bring to every tutorial session?",
+    "answer_location": "In the 'Introduction' section, under the 'Preparation and Materials' subheading.",
+    "answer": "Students are expected to bring the following materials to every tutorial, starting with the first one:\n*   A scientific calculator [Cite: PC141tutorialRules.pdf, Page: 2]\n*   Your physics textbook and/or lecture notes [Cite: PC141tutorialRules.pdf, Page: 2]\n*   A notebook for short quizzes and handwritten problem solving [Cite: PC141tutorialRules.pdf, Page: 2]",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": 6.754616737365723
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": 4.401320457458496
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 1,
+        "rerank_score": 1.6428477764129639
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": 0.0018701143562793732
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -0.882140040397644
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "Are students allowed to use cell phones, laptops, or other smart devices during the session?",
+    "answer_location": "In the 'Introduction' section, under the 'Digital Tools Policy' subheading.",
+    "answer": "No, students are not permitted to use these devices during sessions:\n\n*   **Tutorials:** Digital devices, including cell phones, laptops, tablets, and smart devices, are not permitted and must be turned off for the entire tutorial [Cite: PC141tutorialRules.pdf, Page: 2].\n*   **Labs:** Laboratory sessions are device-free environments where the use of cell phones, laptops, tablets, smart watches, or any electronic devices is not permitted [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4]. All devices must be turned off and stored away [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 4].",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": 4.208256721496582
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": 2.5187578201293945
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -6.020046234130859
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -7.544814586639404
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 1,
+        "rerank_score": -8.498456954956055
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What is the proper protocol and email address for communicating with the instructor?",
+    "answer_location": "In the 'Introduction' section, under the 'Communication' subheading.",
+    "answer": "The proper protocol for communicating with the instructor is as follows:\n\n*   **Email Address:** The instructor can be reached at hshodiev@wlu.ca [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 1].\n*   **Email Requirements:** You must use your myLaurier webmail account only [Cite: PC141tutorialRules.pdf, Page: 2]. The subject line must include your course code and tutorial section (for example, PC141 – Tutorial Section T02), as emails without this identification may not receive a response [Cite: PC141tutorialRules.pdf, Page: 2].\n*   **Restrictions:** Messages should not be sent through MyLearningSpace [Cite: PC141tutorialRules.pdf, Page: 2]. Additionally, sensitive medical information should not be sent by email; instead, required documentation should be brought to the next lab or tutorial session [Cite: PC141LabSyllabus2026FRAG.pdf, Page: 3].",
+    "retrieved": [
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -5.11261510848999
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 1,
+        "rerank_score": -8.118288040161133
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": -8.392757415771484
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -9.505744934082031
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -10.421941757202148
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "When and where are the instructor's office hours held?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Office Hours' subheading.",
+    "answer": "The instructor's office hours are held on Thursdays from 4:00 pm to 6:00 pm in Room R2089 [Cite: PC141tutorialRules.pdf, Page: 3].",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 3,
+        "rerank_score": 2.8732900619506836
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 2,
+        "rerank_score": -5.615730285644531
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 4,
+        "rerank_score": -7.302396774291992
+      },
+      {
+        "source": "PC141labRules.pdf",
+        "page": 2,
+        "rerank_score": -8.302144050598145
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -9.308143615722656
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What specific resources are permitted during the open-book written tutorial reports?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Tutorial Format' subheading, specifically within the 'Permitted Resources' bulleted list.",
+    "answer": "During the open-book written tutorial reports, only the following resources are permitted:\n\n*   Scientific calculator [Cite: PC141tutorialRules.pdf, Page: 3]\n*   Course textbook, if printed [Cite: PC141tutorialRules.pdf, Page: 3]\n*   Lecture notes [Cite: PC141tutorialRules.pdf, Page: 3]\n*   Homework and tutorial notes [Cite: PC141tutorialRules.pdf, Page: 4]",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 3,
+        "rerank_score": 5.970381736755371
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 4,
+        "rerank_score": 0.25568336248397827
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": -2.5138731002807617
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 1,
+        "rerank_score": -7.0150041580200195
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -7.776656150817871
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "How much time do students have to raise concerns about their grades after a tutorial has been marked?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Attendance and Grading Policies' subheading, specifically at numbered point 18.",
+    "answer": "Students must raise any concerns regarding marking or grade recording within one week of the work being marked [Cite: PC141tutorialRules.pdf, Page: 5].",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": 2.58048152923584
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 3,
+        "rerank_score": -2.958643913269043
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 4,
+        "rerank_score": -3.142825126647949
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 1,
+        "rerank_score": -6.5801100730896
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": -7.56290864944458
+      }
+    ],
+    "reference_file_retrieved": true
+  },
+  {
+    "reference_file": "PC141tutorialRules.pdf",
+    "question": "What is the penalty for using unauthorized digital tools or AI-based systems during a tutorial?",
+    "answer_location": "In the 'Tutorial Policies and Procedures' section, under the 'Tutorial Format' subheading, in the paragraph immediately following the 'Permitted Resources' list.",
+    "answer": "The use of any unauthorized digital tools, online resources, or AI-based systems will result in a grade of zero for that week’s tutorial report and may lead to more severe academic penalties [Cite: PC141tutorialRules.pdf, Page: 4].",
+    "retrieved": [
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 4,
+        "rerank_score": 6.727573394775391
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 2,
+        "rerank_score": -0.5582073926925659
+      },
+      {
+        "source": "PC141LabSyllabus2026FRAG.pdf",
+        "page": 4,
+        "rerank_score": -7.856069087982178
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 5,
+        "rerank_score": -8.187641143798828
+      },
+      {
+        "source": "PC141tutorialRules.pdf",
+        "page": 3,
+        "rerank_score": -8.465082168579102
+      }
+    ],
+    "reference_file_retrieved": true
+  }
+]

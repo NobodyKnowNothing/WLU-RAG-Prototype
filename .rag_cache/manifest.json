@@ -1,0 +1,25 @@
+{
+  "fingerprint": "013db9db075b340a",
+  "docs": {
+    "PC141labRAG.pdf": {
+      "sha256": "95b8c182670ad0292147d25c8b96577b5b918ae3e9ecda133715e8080f87e690",
+      "n_chunks": 22,
+      "indexed_at": "2026-10-16T17:40:49"
+    },
+    "PC141LabSyllabus2026FRAG.pdf": {
+      "sha256": "755d2c75994e0bad2ebbcf67878389b1a151cec6320d26f46e4949977975ee83",
+      "n_chunks": 4,
+      "indexed_at": "2026-10-16T17:42:27"
+    },
+    "PC141tutorialRules.pdf": {
+      "sha256": "42111058b0a7771a0bf7971b3a7a405cddc25a4525da86e26bd5e35cfd6dcb12",
+      "n_chunks": 5,
+      "indexed_at": "2026-10-16T17:43:41"
+    },
+    "PC141labRules.pdf": {
+      "sha256": "a4ac640e1347e9bff9d6fd6e8431818bda158680d8b7f5140ec6ea4b6319c48b",
+      "n_chunks": 5,
+      "indexed_at": "2026-10-16T17:44:28"
+    }
+  }
+}
