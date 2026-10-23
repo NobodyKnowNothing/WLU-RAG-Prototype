@@ -63,7 +63,7 @@ async function retrieve(env, query) {
 }
 
 async function rerank(env, query, docs) {
-  const res = await stage("rerank", env.AI.run(RERANK_MODEL, { query, contexts: docs.map((d) => ({ text: d.text })), top_k: RERANK_TOP_N }));
+  const res = await stage("rerank", env.AI.run(RERANK_MODEL, { query, contexts: docs.map((d) => ({ text: d.enriched })), top_k: RERANK_TOP_N }));
   return res.response
     .sort((a, b) => b.score - a.score)
     .slice(0, RERANK_TOP_N)
