@@ -3,7 +3,8 @@ import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
-const LLM_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const DEFAULT_LLM_MODEL = "@cf/google/gemma-4-26b-a4b-it";
+const LLM_ATTEMPTS = 3; // Gemma sometimes returns an empty reply; retry before giving up
 const TOP_K = 150;
 const RERANK_TOP_N = 5;
 const RRF_K = 60;
@@ -73,15 +74,19 @@ async function rerank(env, query, docs) {
 async function answer(env, query) {
   const docs = await rerank(env, query, await retrieve(env, query));
   const context = docs.map((d) => `[Source: ${d.source}, Page: ${d.page}]\n${d.text}`).join("\n\n");
-  const res = await stage("generate", env.AI.run(LLM_MODEL, {
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Context:\n${context}\n\nQuestion: ${query}` },
-    ],
-    temperature: 0.3,
-    max_tokens: 1024,
-  }));
-  const text = res.response ?? res.choices?.[0]?.message?.content ?? "";
+  let text = "";
+  for (let attempt = 0; attempt < LLM_ATTEMPTS && !text.trim(); attempt++) {
+    const res = await stage("generate", env.AI.run(env.LLM_MODEL || DEFAULT_LLM_MODEL, {
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: `Context:\n${context}\n\nQuestion: ${query}` },
+      ],
+      temperature: 0.3,
+      max_tokens: 1024,
+    }));
+    text = res.response ?? res.choices?.[0]?.message?.content ?? "";
+  }
+  if (!text.trim()) throw new Error("generate: model returned an empty answer");
   return {
     answer: text.trim(),
     sources: docs.map((d) => ({ source: d.source, page: d.page, text: d.text, score: d.score })),

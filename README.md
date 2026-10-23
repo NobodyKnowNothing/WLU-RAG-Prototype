@@ -65,7 +65,7 @@ Every answer cites its source, and the 19 answers agree with the expected answer
 
 ## Web demo
 
-A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/pages.yml`. It calls a Cloudflare Worker in `worker/` that re-implements the pipeline on Workers AI (BM25 + `bge-small` embeddings with RRF, `bge-reranker-base`, then Llama 3.3 70B for the answer), so it does not need an API key.
+A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/pages.yml`. It calls a Cloudflare Worker in `worker/` that re-implements the pipeline on Workers AI (BM25 + `bge-small` embeddings with RRF, `bge-reranker-base`, then Gemma 4 26B for the answer), so it does not need an API key.
 
 ```bash
 python scripts/export_chunks.py      # refresh worker/src/chunks.json from .rag_cache/
