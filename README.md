@@ -62,3 +62,14 @@ Every answer cites its source, and the 19 answers agree with the expected answer
 - Cited page numbers are PDF page positions, not the numbers printed on the page. For example, "Page 2" in the printed lab manual is PDF page 6.
 - Gemma 4 calls take 20–70 s each and sometimes fail with 500/503 errors. The client fails over to the other model and retries.
 - Gemma's thinking is set to minimal. With the default setting, its hidden reasoning used up the reply's token limit and answers came back empty or cut off.
+
+## Web demo
+
+A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/pages.yml`. It calls a Cloudflare Worker in `worker/` that re-implements the pipeline on Workers AI (BM25 + `bge-small` embeddings with RRF, `bge-reranker-base`, then Llama 3.3 70B for the answer), so it does not need an API key.
+
+```bash
+python scripts/export_chunks.py      # refresh worker/src/chunks.json from .rag_cache/
+cd worker && npx wrangler deploy     # redeploy the API
+```
+
+The Worker only accepts requests from the Pages origin (`ALLOWED_ORIGIN` in `worker/wrangler.jsonc`). The Python CLI still uses Gemma through the Gemini API; the web demo uses different models, so its answers can differ.

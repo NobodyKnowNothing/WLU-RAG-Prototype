@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC141 Course Assistant</title>
+<style>
+  :root { --bg:#fff; --fg:#1b1f24; --muted:#5d6670; --line:#d9dde2; --card:#f6f7f9; --accent:#4b2e83; --accent-fg:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --fg:#e8eaed; --muted:#9aa3ad; --line:#2d333b; --card:#1c2026; --accent:#a58be0; --accent-fg:#14161a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 24px; }
+  form { display:flex; gap:8px; }
+  input { flex:1; padding:10px 12px; font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; }
+  button { padding:10px 18px; font:inherit; font-weight:600; color:var(--accent-fg); background:var(--accent); border:0; border-radius:8px; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .examples { margin:12px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
+  .examples button { font-weight:400; font-size:.85rem; padding:4px 10px; color:var(--fg); background:var(--card); border:1px solid var(--line); border-radius:999px; }
+  #out { margin-top:28px; }
+  .answer { white-space:pre-wrap; }
+  .error { color:#c0392b; }
+  h2 { font-size:1rem; margin:28px 0 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 12px; margin-bottom:8px; }
+  summary { cursor:pointer; font-weight:600; }
+  details p { white-space:pre-wrap; font-size:.9rem; color:var(--muted); margin:8px 0 0; }
+  footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+  footer a { color:inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1>PC141 Course Assistant</h1>
+  <p class="sub">Ask a question about the PC141 lab and tutorial rules and syllabus. Answers cite the source PDF and page.</p>
+  <form id="f">
+    <input id="q" type="text" maxlength="500" placeholder="Can I use my phone in the lab?" aria-label="Question" required autofocus>
+    <button id="go" type="submit">Ask</button>
+  </form>
+  <div class="examples" id="examples"></div>
+  <div id="out" aria-live="polite"></div>
+  <footer>
+    Retrieval: BM25 + embeddings fused with RRF, then reranked. Generation: Gemma on Cloudflare Workers AI.
+    Answers can be wrong; check the cited pages. <a href="https://github.com/NobodyKnowNothing/WLU-RAG-Prototype">Source</a>
+  </footer>
+</main>
+<script>
+  // Set this to your deployed Worker URL.
+  const API_URL = "https://wlu-rag-api.nobodyknownothing.workers.dev";
+
+  const $ = (id) => document.getElementById(id);
+  const out = $("out"), go = $("go"), q = $("q");
+
+  const EXAMPLES = ["Can I use my phone in the lab?", "What happens if I miss a tutorial?", "How are lab reports graded?"];
+  for (const ex of EXAMPLES) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = ex;
+    b.onclick = () => { q.value = ex; $("f").requestSubmit(); };
+    $("examples").append(b);
+  }
+
+  function el(tag, props = {}, ...kids) {
+    const e = Object.assign(document.createElement(tag), props);
+    e.append(...kids);
+    return e;
+  }
+
+  $("f").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    go.disabled = true;
+    out.replaceChildren(el("p", { className: "sub", textContent: "Searching the documents…" }));
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q.value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      out.replaceChildren(
+        el("div", { className: "answer", textContent: data.answer }),
+        el("h2", { textContent: "Sources" }),
+        ...data.sources.map((s) =>
+          el("details", {}, el("summary", { textContent: `${s.source}, page ${s.page}` }), el("p", { textContent: s.text }))
+        )
+      );
+    } catch (err) {
+      out.replaceChildren(el("p", { className: "error", textContent: `Something went wrong: ${err.message}` }));
+    } finally {
+      go.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

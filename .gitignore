@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 *.tmp
 .rag_cache/qdrant/.lock
+node_modules/
+.wrangler/
