@@ -69,6 +69,7 @@ A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/p
 
 ```bash
 python scripts/export_chunks.py      # refresh worker/src/chunks.json from .rag_cache/
+python scripts/embed_chunks.py       # precompute worker/src/vectors.json (needs wrangler login)
 cd worker && npx wrangler deploy     # redeploy the API
 ```
 

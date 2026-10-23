@@ -1,4 +1,5 @@
 import chunks from "./chunks.json";
+import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
@@ -39,29 +40,10 @@ function bm25Scores(query, k1 = 1.5, b = 0.75) {
 
 const stage = (name, p) => Promise.resolve(p).catch((e) => { throw new Error(`${name}: ${e.message || e}`); });
 
-let chunkVectors; // Promise, cached per isolate
-async function embedChunks(env) {
-  const out = [];
-  for (let i = 0; i < chunks.length; i += 8) {
-    const batch = chunks.slice(i, i + 8).map((c) => c.enriched);
-    const r = await stage("embed chunks", env.AI.run(EMBED_MODEL, { text: batch }));
-    out.push(...r.data);
-  }
-  return out;
-}
-function getChunkVectors(env) {
-  chunkVectors ??= embedChunks(env).catch((e) => {
-    chunkVectors = undefined; // don't cache a failure
-    throw e;
-  });
-  return chunkVectors;
-}
-
 const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
 const norm = (a) => Math.sqrt(dot(a, a));
 
 async function retrieve(env, query) {
-  const vectors = await getChunkVectors(env);
   const qres = await stage("embed query", env.AI.run(EMBED_MODEL, { text: [query] }));
   const qv = qres.data[0];
   const qn = norm(qv);
