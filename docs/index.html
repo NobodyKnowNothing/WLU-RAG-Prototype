@@ -5,93 +5,281 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PC141 Course Assistant</title>
 <style>
-  :root { --bg:#fff; --fg:#1b1f24; --muted:#5d6670; --line:#d9dde2; --card:#f6f7f9; --accent:#4b2e83; --accent-fg:#fff; }
+  :root {
+    --bg:#fff; --fg:#1b1f24; --muted:#5d6670; --line:#d9dde2; --card:#f6f7f9;
+    --accent:#4b2e83; --accent-fg:#fff;
+    --course:#4b2e83; --course-bg:#f1ecfa; --uni:#8a5a00; --uni-bg:#fdf4e0;
+    --ok:#1e7a3c; --ok-bg:#e8f5ec; --warn:#9a5b00; --warn-bg:#fff4e0; --no:#6b7280; --no-bg:#f1f2f4; --bad:#b42318;
+  }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#14161a; --fg:#e8eaed; --muted:#9aa3ad; --line:#2d333b; --card:#1c2026; --accent:#a58be0; --accent-fg:#14161a; }
+    :root {
+      --bg:#14161a; --fg:#e8eaed; --muted:#9aa3ad; --line:#2d333b; --card:#1c2026;
+      --accent:#a58be0; --accent-fg:#14161a;
+      --course:#b9a2ee; --course-bg:#241d36; --uni:#f2c161; --uni-bg:#2e2512;
+      --ok:#6fd08f; --ok-bg:#15291c; --warn:#f2c161; --warn-bg:#2e2512; --no:#9aa3ad; --no-bg:#1f242b; --bad:#ff8a80;
+    }
   }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width:760px; margin:0 auto; padding:32px 16px 64px; }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 64px; }
   h1 { font-size:1.6rem; margin:0 0 4px; }
-  .sub { color:var(--muted); margin:0 0 24px; }
+  .sub { color:var(--muted); margin:0 0 20px; max-width:720px; }
   form { display:flex; gap:8px; }
-  input { flex:1; padding:10px 12px; font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; }
-  button { padding:10px 18px; font:inherit; font-weight:600; color:var(--accent-fg); background:var(--accent); border:0; border-radius:8px; cursor:pointer; }
-  button:disabled { opacity:.5; cursor:wait; }
-  .examples { margin:12px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
-  .examples button { font-weight:400; font-size:.85rem; padding:4px 10px; color:var(--fg); background:var(--card); border:1px solid var(--line); border-radius:999px; }
+  input[type=text] { flex:1; min-width:0; padding:10px 12px; font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; }
+  button { font:inherit; cursor:pointer; }
+  #go { padding:10px 18px; font-weight:600; color:var(--accent-fg); background:var(--accent); border:0; border-radius:8px; }
+  #go:disabled { opacity:.5; cursor:wait; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin:12px 0 0; font-size:.88rem; color:var(--muted); }
+  .controls label { display:inline-flex; align-items:center; gap:6px; }
+  select { font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:3px 6px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { border:0; background:var(--bg); color:var(--fg); padding:4px 10px; font-size:.85rem; }
+  .seg button + button { border-left:1px solid var(--line); }
+  .seg button[aria-pressed=true] { background:var(--accent); color:var(--accent-fg); }
+  .examples { margin:14px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
+  .examples button { font-size:.85rem; padding:4px 10px; color:var(--fg); background:var(--card); border:1px solid var(--line); border-radius:999px; }
   #out { margin-top:28px; }
-  .answer { white-space:pre-wrap; }
-  .error { color:#c0392b; }
-  h2 { font-size:1rem; margin:28px 0 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
-  details { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 12px; margin-bottom:8px; }
-  summary { cursor:pointer; font-weight:600; }
-  details p { white-space:pre-wrap; font-size:.9rem; color:var(--muted); margin:8px 0 0; }
-  footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+  .status { display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:10px; margin-bottom:16px; }
+  .status strong { display:block; }
+  .status p { margin:2px 0 0; font-size:.92rem; }
+  .status .icon { font-size:1.2rem; line-height:1.3; }
+  .status.answered { background:var(--ok-bg); color:var(--ok); }
+  .status.partial { background:var(--warn-bg); color:var(--warn); }
+  .status.not_found { background:var(--no-bg); color:var(--fg); }
+  .status.not_found .icon { color:var(--no); }
+  .status p { color:var(--fg); }
+  .panels { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .panels.single { grid-template-columns:1fr; }
+  @media (max-width: 720px) { .panels { grid-template-columns:1fr; } form { flex-direction:column; } }
+  .panel { border:1px solid var(--line); border-radius:10px; padding:14px 16px; border-top:4px solid var(--c); }
+  .panel.pc141 { --c:var(--course); --cbg:var(--course-bg); }
+  .panel.laurier { --c:var(--uni); --cbg:var(--uni-bg); }
+  .panel h2 { margin:0; font-size:1.02rem; color:var(--c); }
+  .panel .tag { font-size:.8rem; color:var(--muted); margin:2px 0 10px; }
+  .panel ul { margin:0; padding-left:18px; }
+  .panel li { margin:0 0 10px; }
+  .panel .empty { color:var(--muted); font-size:.9rem; margin:0; }
+  .cite { display:inline-block; font-size:.75rem; font-weight:600; line-height:1; padding:3px 6px; margin-left:4px; border-radius:6px; border:0; color:var(--c); background:var(--cbg); vertical-align:1px; }
+  .quote { display:block; margin:4px 0 0; font-size:.84rem; color:var(--muted); border-left:3px solid var(--line); padding-left:8px; }
+  .flag { display:block; font-size:.8rem; color:var(--bad); margin-top:2px; }
+  h3 { font-size:.85rem; margin:26px 0 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .src { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 12px; margin-bottom:8px; border-left:4px solid var(--c); }
+  .src.pc141 { --c:var(--course); }
+  .src.laurier { --c:var(--uni); }
+  .src.uncited { opacity:.7; }
+  .src.flash { outline:2px solid var(--c); }
+  .src summary { cursor:pointer; }
+  .src .n { font-weight:700; color:var(--c); margin-right:4px; }
+  .src .doc { font-weight:600; }
+  .src .sec { display:block; font-size:.88rem; }
+  .src .meta { display:block; font-size:.8rem; color:var(--muted); }
+  .src .meta a { color:inherit; }
+  .src p { white-space:pre-wrap; font-size:.86rem; color:var(--muted); margin:8px 0 0; }
+  .pages { font-size:.85rem; color:var(--muted); }
+  .pages a { color:inherit; }
+  .error { color:var(--bad); }
+  .muted { color:var(--muted); font-size:.85rem; }
+  details.about { margin-top:40px; border-top:1px solid var(--line); padding-top:12px; }
+  details.about summary { cursor:pointer; font-weight:600; }
+  table { border-collapse:collapse; font-size:.88rem; margin:8px 0; width:100%; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }
+  footer { margin-top:28px; color:var(--muted); font-size:.85rem; }
   footer a { color:inherit; }
 </style>
 </head>
 <body>
 <main>
   <h1>PC141 Course Assistant</h1>
-  <p class="sub">Ask a question about the PC141 lab and tutorial rules and syllabus. Answers cite the source PDF and page.</p>
+  <p class="sub">Ask about PC141 labs, tutorials and course rules, or about Laurier's university-wide policies. Every answer cites the document and section it comes from. If the assistant can't verify something, it says so instead of guessing.</p>
   <form id="f">
-    <input id="q" type="text" maxlength="500" placeholder="Can I use my phone in the lab?" aria-label="Question" required autofocus>
+    <input id="q" type="text" maxlength="500" placeholder="When is my lab?" aria-label="Question" required autofocus>
     <button id="go" type="submit">Ask</button>
   </form>
+  <div class="controls">
+    <label>Lab section <select id="lab"><option value="">Not set</option></select></label>
+    <label>Tutorial <select id="tut"><option value="">Not set</option></select></label>
+    <span>Search <span class="seg" id="scope" role="group" aria-label="Sources to search">
+      <button type="button" data-v="both">PC141 + Laurier</button><button type="button" data-v="pc141">PC141 only</button><button type="button" data-v="laurier">Laurier only</button>
+    </span></span>
+    <span>Retrieval <span class="seg" id="mode" role="group" aria-label="Retrieval pipeline">
+      <button type="button" data-v="full" title="BM25 + embeddings, fused and reranked">Full</button><button type="button" data-v="simple" title="Keyword (BM25) search only">Simple</button>
+    </span></span>
+  </div>
   <div class="examples" id="examples"></div>
   <div id="out" aria-live="polite"></div>
+
+  <details class="about" id="about">
+    <summary>How it works and how accurate it is</summary>
+    <p><strong>Sources.</strong> PC141 course rules come from the course PDFs in the repository (syllabus, MyLearningSpace announcements, lab manual), split by section. University-wide information comes from official Laurier pages (the 2026/27 Undergraduate Academic Calendar, students.wlu.ca and Laurier's policy pages). The assistant fetches those pages live from wlu.ca when a question needs them, and keeps a copy for up to 6 hours.</p>
+    <p><strong>Verification.</strong> The model must give each statement a source and an exact supporting quote. Statements with no valid source are removed. Statements whose quote isn't in the cited section, or that mention a number, time or email the section doesn't contain, are marked unverified.</p>
+    <p><strong>Retrieval.</strong> <em>Simple</em> is keyword search (BM25). <em>Full</em> adds embeddings, fuses both with reciprocal rank fusion and reranks with a cross-encoder.</p>
+    <div id="eval"><p class="muted">Loading evaluation results…</p></div>
+    <p class="muted">The PC141 documents are the instructor's. Laurier pages are linked to their source; check them before acting on an answer.</p>
+  </details>
   <footer>
-    Retrieval: BM25 + embeddings fused with RRF, then reranked. Generation: Llama 3.3 on Cloudflare Workers AI.
-    Answers can be wrong; check the cited pages. <a href="https://github.com/NobodyKnowNothing/WLU-RAG-Prototype">Source</a>
+    Generation: Llama 3.3 70B on Cloudflare Workers AI. Answers can be wrong; check the cited sections. <a href="https://github.com/NobodyKnowNothing/WLU-RAG-Prototype">Source</a>
   </footer>
 </main>
 <script>
-  // Set this to your deployed Worker URL.
-  const API_URL = "https://wlu-rag-api.nobodyknownothing.workers.dev";
+  const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+  const API_URL = LOCAL ? "http://127.0.0.1:8787" : "https://wlu-rag-api.nobodyknownothing.workers.dev";
 
   const $ = (id) => document.getElementById(id);
   const out = $("out"), go = $("go"), q = $("q");
-
-  const EXAMPLES = ["Can I use my phone in the lab?", "What happens if I miss a tutorial?", "How are lab reports graded?"];
-  for (const ex of EXAMPLES) {
-    const b = document.createElement("button");
-    b.type = "button"; b.textContent = ex;
-    b.onclick = () => { q.value = ex; $("f").requestSubmit(); };
-    $("examples").append(b);
-  }
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
 
   function el(tag, props = {}, ...kids) {
     const e = Object.assign(document.createElement(tag), props);
-    e.append(...kids);
+    e.append(...kids.filter((k) => k != null && k !== false));
     return e;
+  }
+
+  function segmented(id, key, fallback) {
+    const group = $(id);
+    const set = (v) => { for (const b of group.children) b.setAttribute("aria-pressed", String(b.dataset.v === v)); store.set(key, v); };
+    for (const b of group.children) b.onclick = () => set(b.dataset.v);
+    set(store.get(key) || fallback);
+    return () => [...group.children].find((b) => b.getAttribute("aria-pressed") === "true").dataset.v;
+  }
+  const getScope = segmented("scope", "pc141.scope", "both");
+  const getMode = segmented("mode", "pc141.mode", "full");
+
+  function fillSections(codes) {
+    for (const [id, list] of [["lab", codes.lab], ["tut", codes.tutorial]]) {
+      const sel = $(id);
+      for (const c of list) sel.append(el("option", { value: c, textContent: c }));
+      sel.value = store.get(`pc141.${id}`) || "";
+      sel.onchange = () => store.set(`pc141.${id}`, sel.value);
+    }
+  }
+  // Section codes come from the course documents; the fallback keeps the page usable if /meta is down.
+  fetch(`${API_URL}/meta`).then((r) => r.json()).then((m) => fillSections(m.sectionCodes))
+    .catch(() => fillSections({ lab: Array.from({ length: 11 }, (_, i) => `L${String(i + 1).padStart(2, "0")}`), tutorial: ["T01", "T02"] }));
+
+  const EXAMPLES = [
+    "When is my lab?",
+    "What do I do if I miss my lab?",
+    "Where do I submit my post-lab?",
+    "What are the plagiarism rules?",
+    "How do I defer a final exam?",
+    "Can I use ChatGPT on assignments?",
+    "What is the weighting of the final exam?",
+  ];
+  for (const ex of EXAMPLES) {
+    $("examples").append(el("button", { type: "button", textContent: ex, onclick: () => { q.value = ex; $("f").requestSubmit(); } }));
+  }
+
+  const STATUS = {
+    answered: ["✓", "Verified against the sources", "Every statement below is backed by a quote from the cited section."],
+    partial: ["◐", "Partly verified", ""],
+    not_found: ["✕", "Couldn't verify an answer", ""],
+  };
+  const when = (iso) => new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  const safeUrl = (u) => (/^https:\/\//.test(u) ? u : "#");
+
+  function flash(n) {
+    const card = document.getElementById(`src-${n}`);
+    if (!card) return;
+    card.open = true;
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 1500);
+  }
+
+  function claimItem(c) {
+    return el("li", {},
+      c.text,
+      ...c.sources.map((n) => el("button", { type: "button", className: "cite", textContent: n, title: `Show source ${n}`, onclick: () => flash(n) })),
+      c.quote && el("span", { className: "quote", textContent: `“${c.quote.replace(/\s+/g, " ").trim()}”` }),
+      !c.verified && el("span", { className: "flag", textContent: `⚠ Unverified: ${c.issue}` })
+    );
+  }
+
+  function panel(kind, claims) {
+    const pc = kind === "pc141";
+    const empty = pc ? "No PC141 course rule found for this question." : "No university-wide policy found for this question.";
+    return el("section", { className: `panel ${kind}` },
+      el("h2", { textContent: pc ? "PC141 course rules" : "Laurier university-wide" }),
+      el("div", { className: "tag", textContent: pc ? "From the instructor's course documents" : "From official Laurier pages, fetched live from wlu.ca" }),
+      claims.length ? el("ul", {}, ...claims.map(claimItem)) : el("p", { className: "empty", textContent: empty })
+    );
+  }
+
+  function sourceCard(s, cited) {
+    const pc = s.kind === "pc141";
+    const pages = s.pages?.length ? `${s.pages.length > 1 ? "pp." : "p."} ${s.pages.join(", ")}` : "";
+    const meta = pc
+      ? el("span", { className: "meta", textContent: ["PC141 course document", s.file, pages].filter(Boolean).join(" · ") })
+      : el("span", { className: "meta" }, `${s.publisher} · fetched ${when(s.fetchedAt)} · `, el("a", { href: safeUrl(s.url), target: "_blank", rel: "noopener", textContent: "open on wlu.ca ↗" }));
+    return el("details", { className: `src ${s.kind}${cited ? "" : " uncited"}`, id: `src-${s.n}` },
+      el("summary", {}, el("span", { className: "n", textContent: `[${s.n}]` }), el("span", { className: "doc", textContent: s.title }),
+        el("span", { className: "sec", textContent: `Section: ${s.section}` }), meta),
+      s.intro && el("p", { textContent: `Announcement opening: ${s.intro}` }),
+      el("p", { textContent: s.text })
+    );
+  }
+
+  function render(data) {
+    if (!Array.isArray(data.pc141)) {
+      // An older API without separated, verified claims: show its plain answer.
+      out.replaceChildren(el("div", { className: "answer", style: "white-space:pre-wrap", textContent: data.answer || "No answer." }));
+      return;
+    }
+    const [icon, title, okText] = STATUS[data.status] || STATUS.not_found;
+    const cited = new Set([...data.pc141, ...data.laurier].flatMap((c) => c.sources));
+    const pages = data.laurierPages || [];
+    const ordered = [...data.sources].sort((a, b) => cited.has(b.n) - cited.has(a.n) || a.n - b.n);
+    out.replaceChildren(
+      el("div", { className: `status ${data.status}` }, el("span", { className: "icon", textContent: icon }),
+        el("div", {}, el("strong", { textContent: title }), el("p", { textContent: data.unverified || okText }))),
+      el("div", { className: `panels${data.scope === "both" ? "" : " single"}` },
+        data.scope !== "laurier" && panel("pc141", data.pc141), data.scope !== "pc141" && panel("laurier", data.laurier)),
+      el("h3", { textContent: `Sources (${cited.size} cited, ${data.sources.length} searched)` }),
+      ...ordered.map((s) => sourceCard(s, cited.has(s.n))),
+      pages.length && el("p", { className: "pages" }, "Laurier pages checked: ",
+        ...pages.flatMap((p, i) => [i ? ", " : "", el("a", { href: safeUrl(p.url), target: "_blank", rel: "noopener", textContent: p.title }), p.error ? ` (unavailable: ${p.error})` : ""])),
+      el("p", { className: "muted", textContent: `${data.mode === "simple" ? "Simple" : "Full"} retrieval · ${((data.timings.retrieveMs + (data.timings.generateMs || 0)) / 1000).toFixed(1)} s` })
+    );
   }
 
   $("f").addEventListener("submit", async (ev) => {
     ev.preventDefault();
     go.disabled = true;
-    out.replaceChildren(el("p", { className: "sub", textContent: "Searching the documents…" }));
+    const scope = getScope();
+    const searching = { both: "the PC141 documents and official Laurier pages", pc141: "the PC141 documents", laurier: "official Laurier pages" }[scope];
+    out.replaceChildren(el("p", { className: "sub", textContent: `Searching ${searching}…` }));
     try {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q.value }),
+        body: JSON.stringify({ question: q.value, scope, mode: getMode(), sections: { lab: $("lab").value, tutorial: $("tut").value } }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
-      out.replaceChildren(
-        el("div", { className: "answer", textContent: data.answer }),
-        el("h2", { textContent: "Sources" }),
-        ...data.sources.map((s) =>
-          el("details", {}, el("summary", { textContent: `${s.source}, page ${s.page}` }), el("p", { textContent: s.text }))
-        )
-      );
+      if (!res.ok) throw new Error(data.detail || data.error || res.statusText);
+      render(data);
     } catch (err) {
       out.replaceChildren(el("p", { className: "error", textContent: `Something went wrong: ${err.message}` }));
     } finally {
       go.disabled = false;
     }
   });
+
+  // Accuracy numbers from scripts/eval_web.py, if they have been published with the site.
+  fetch("eval.json").then((r) => (r.ok ? r.json() : Promise.reject())).then((ev) => {
+    const rows = Object.entries(ev.metrics);
+    const modes = Object.keys(rows[0][1]);
+    $("eval").replaceChildren(
+      el("p", {}, el("strong", { textContent: "Measured accuracy. " }), ev.summary),
+      el("table", {},
+        el("thead", {}, el("tr", {}, el("th", { textContent: "Check" }), ...modes.map((m) => el("th", { textContent: m[0].toUpperCase() + m.slice(1) })))),
+        el("tbody", {}, ...rows.map(([name, by]) => el("tr", {}, el("td", { textContent: name }), ...modes.map((m) => el("td", { textContent: by[m] == null ? "not run" : String(by[m]) })))))
+      ),
+      el("p", { className: "muted", textContent: `${ev.questions} questions, run ${ev.date}.` })
+    );
+  }).catch(() => $("eval").replaceChildren());
 </script>
 </body>
 </html>

@@ -1,100 +1,157 @@
-import chunks from "./chunks.json";
+import chunks from "./chunks.json"; // built by scripts/export_chunks.py
 import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
+import { RESPONSE_SCHEMA, SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
+import { PAGES, searchLaurier } from "./laurier.js";
+import { BM25, cosine, expandQuery, rrf } from "./retrieval.js";
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
 const LLM_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const TOP_K = 150;
-const RERANK_TOP_N = 5;
-const RRF_K = 60;
+const PC141_TOP_N = 5;
+const LAURIER_TOP_N = 3;
+const MODES = ["simple", "full"];
+const SCOPES = ["both", "pc141", "laurier"];
 
-const SYSTEM_PROMPT =
-  "You are a scholarly assistant. Answer the user's question using ONLY the provided context. " +
-  "You MUST cite the source document and page number inline for every factual claim you make " +
-  "(e.g., [Cite: PC141labRules.pdf, Page: 2]). If the answer is not in the context, state that you do not know.";
+const courseIndex = new BM25(chunks.map((c) => c.enriched));
+const hasVectors = vectors.length === chunks.length; // stale vectors.json: fall back to lexical search
 
-const tokenize = (s) => s.toLowerCase().match(/\w+/g) || [];
-
-// BM25 (Okapi) over the enriched chunk text, built once per isolate.
-const docTokens = chunks.map((c) => tokenize(c.enriched));
-const avgLen = docTokens.reduce((n, t) => n + t.length, 0) / docTokens.length;
-const df = new Map();
-for (const toks of docTokens) for (const t of new Set(toks)) df.set(t, (df.get(t) || 0) + 1);
-
-function bm25Scores(query, k1 = 1.5, b = 0.75) {
-  const q = tokenize(query);
-  return docTokens.map((toks) => {
-    const tf = new Map();
-    for (const t of toks) tf.set(t, (tf.get(t) || 0) + 1);
-    let score = 0;
-    for (const t of q) {
-      const f = tf.get(t);
-      if (!f) continue;
-      const n = df.get(t);
-      const idf = Math.log((chunks.length - n + 0.5) / (n + 0.5) + 1);
-      score += (idf * f * (k1 + 1)) / (f + k1 * (1 - b + (b * toks.length) / avgLen));
-    }
-    return score;
-  });
-}
+// Section codes that appear in the course documents, e.g. "PC141–L04" -> lab "L04".
+const SECTION_CODES = { lab: new Set(), tutorial: new Set() };
+for (const c of chunks) for (const [, k] of c.text.matchAll(/PC141\s*[–-]\s*([LT]\d{2})/g)) SECTION_CODES[k[0] === "L" ? "lab" : "tutorial"].add(k);
 
 const stage = (name, p) => Promise.resolve(p).catch((e) => { throw new Error(`${name}: ${e.message || e}`); });
 
-const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
-const norm = (a) => Math.sqrt(dot(a, a));
+// Cross-encoder scores for `texts`, best first: [{ index, score }].
+async function rerank(env, query, texts) {
+  if (!texts.length) return [];
+  const res = await stage("rerank", env.AI.run(RERANK_MODEL, { query, contexts: texts.map((text) => ({ text })), top_k: texts.length }));
+  return res.response.map((r) => ({ index: r.id, score: r.score })).sort((a, b) => b.score - a.score);
+}
 
-async function retrieve(env, query) {
-  const qres = await stage("embed query", env.AI.run(EMBED_MODEL, { text: [query] }));
-  const qv = qres.data[0];
-  const qn = norm(qv);
-  const dense = vectors.map((v, i) => [i, dot(qv, v) / (qn * norm(v))]).sort((a, b) => b[1] - a[1]).slice(0, TOP_K);
-  const sparseScores = bm25Scores(query);
-  const sparse = sparseScores
-    .map((s, i) => [i, s])
-    .filter(([, s]) => s > 0)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, TOP_K);
+// An announcement's opening text ("Labs are held on alternate weeks in Room N2089") is context for
+// every subsection under it, so the best-ranked subsection carries it as `intro`.
+const parentOf = new Map();
+for (const c of chunks) {
+  const [top, ...rest] = c.section.split(" > ");
+  const parent = rest.length && chunks.find((p) => p.source === c.source && p.section === top);
+  if (parent) parentOf.set(c.id, parent);
+}
+function withParents(found) {
+  const seen = new Set(found.map((c) => c.id));
+  return found.map((c) => {
+    const p = parentOf.get(c.id);
+    if (!p || seen.has(p.id)) return c;
+    seen.add(p.id);
+    return { ...c, intro: p.text };
+  });
+}
 
-  const fused = new Map();
-  for (const ranked of [dense, sparse]) {
-    ranked.forEach(([i], rank) => fused.set(i, (fused.get(i) || 0) + 1 / (RRF_K + rank + 1)));
+async function searchCourse(env, query, mode) {
+  return withParents(await rankCourse(env, query, mode));
+}
+
+async function rankCourse(env, query, mode) {
+  if (mode === "simple") return courseIndex.rank(query, PC141_TOP_N).map(([i, score]) => ({ ...chunks[i], score }));
+  const lists = [courseIndex.rank(query, TOP_K)];
+  if (hasVectors) {
+    const qv = (await stage("embed query", env.AI.run(EMBED_MODEL, { text: [query] }))).data[0];
+    lists.push(vectors.map((v, i) => [i, cosine(qv, v)]).sort((a, b) => b[1] - a[1]).slice(0, TOP_K));
   }
-  return [...fused.entries()].sort((a, b) => b[1] - a[1]).slice(0, TOP_K).map(([i]) => chunks[i]);
+  const pool = rrf(lists).slice(0, TOP_K);
+  // Cross-encoder scores are well ordered but poorly calibrated on these short admin texts (the
+  // right section can score 0.003), so keep the top few by rank and let the model skip the rest.
+  const scored = await rerank(env, query, pool.map((i) => chunks[i].enriched));
+  return scored.slice(0, PC141_TOP_N).map((r) => ({ ...chunks[pool[r.index]], score: r.score }));
 }
 
-async function rerank(env, query, docs) {
-  const res = await stage("rerank", env.AI.run(RERANK_MODEL, { query, contexts: docs.map((d) => ({ text: d.enriched })), top_k: RERANK_TOP_N }));
-  return res.response
-    .sort((a, b) => b.score - a.score)
-    .slice(0, RERANK_TOP_N)
-    .map((r) => ({ ...docs[r.id], score: r.score }));
+async function retrieve(env, ctx, { question, mode, scope, sections }) {
+  // Section codes help the lexical search find the right schedule row.
+  const query = expandQuery([question, sections.lab && `PC141-${sections.lab}`, sections.tutorial && `PC141-${sections.tutorial}`].filter(Boolean).join(" "));
+  const [course, laurier] = await Promise.all([
+    scope === "laurier" ? [] : searchCourse(env, query, mode),
+    scope === "pc141" ? { sources: [], pages: [] } : searchLaurier(expandQuery(question), { mode, k: LAURIER_TOP_N, ctx, rerank: (q, t) => rerank(env, q, t) }),
+  ]);
+  const sources = [...course.map((c) => ({ ...c, kind: "pc141" })), ...laurier.sources].map((s, i) => ({ n: i + 1, ...s }));
+  return { sources, pages: laurier.pages };
 }
 
-async function answer(env, query) {
-  const docs = await rerank(env, query, await retrieve(env, query));
-  const context = docs.map((d) => `[Source: ${d.source}, Page: ${d.page}]\n${d.text}`).join("\n\n");
-  const res = await stage("generate", env.AI.run(LLM_MODEL, {
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Context:\n${context}\n\nQuestion: ${query}` },
-    ],
-    temperature: 0.3,
-    max_tokens: 1024,
-  }));
-  const text = res.response ?? res.choices?.[0]?.message?.content ?? "";
+async function generate(env, question, sources, sections) {
+  const run = () =>
+    env.AI.run(LLM_MODEL, {
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildUserMessage(question, sources, sections) },
+      ],
+      response_format: { type: "json_schema", json_schema: RESPONSE_SCHEMA },
+      temperature: 0.1,
+      max_tokens: 1200,
+    });
+  const res = await stage("generate", run().catch(run)); // one retry for transient model errors
+  let out = res.response ?? res.choices?.[0]?.message?.content;
+  if (typeof out === "string") {
+    try {
+      out = JSON.parse(out);
+    } catch {
+      out = { status: "not_found", pc141: [], laurier: [], unverified: "The model returned an unreadable answer." };
+    }
+  }
+  return out;
+}
+
+const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, fetchedAt, text, intro, score }) =>
+  kind === "pc141"
+    ? { n, kind, title, section, pages, file: source, text, ...(intro && { intro }), score }
+    : { n, kind, title, section, page: pageId, publisher, url, fetchedAt, text, score };
+
+async function ask(env, ctx, req) {
+  const t0 = Date.now();
+  const { sources, pages } = await retrieve(env, ctx, req);
+  const t1 = Date.now();
+  const base = { mode: req.mode, scope: req.scope, sources: sources.map(publicSource), laurierPages: pages };
+  if (req.retrieveOnly) return { ...base, timings: { retrieveMs: t1 - t0 } };
+  // Nothing relevant anywhere: say so without asking the model to improvise.
+  const result = sources.length
+    ? verifyAnswer(await generate(env, req.question, sources, req.sections), sources)
+    : { status: "not_found", pc141: [], laurier: [], unverified: "No PC141 document or official Laurier page that was searched covers this question." };
+  return { ...base, ...result, answer: answerText(result), timings: { retrieveMs: t1 - t0, generateMs: Date.now() - t1 } };
+}
+
+function meta() {
+  const docs = new Map();
+  for (const c of chunks) docs.set(c.source, { file: c.source, title: c.title, sections: (docs.get(c.source)?.sections || 0) + 1 });
   return {
-    answer: text.trim(),
-    sources: docs.map((d) => ({ source: d.source, page: d.page, text: d.text, score: d.score })),
+    pc141: [...docs.values()],
+    laurier: PAGES.map(({ id, title, publisher, url }) => ({ id, title, publisher, url })),
+    sectionCodes: { lab: [...SECTION_CODES.lab].sort(), tutorial: [...SECTION_CODES.tutorial].sort() },
+    modes: MODES,
+    scopes: SCOPES,
+  };
+}
+
+function parseRequest(body) {
+  const { question, mode = "full", scope = "both", retrieveOnly = false } = body || {};
+  const sections = body?.sections && typeof body.sections === "object" ? body.sections : {};
+  if (typeof question !== "string" || !question.trim() || question.length > 500) return { error: "question must be a non-empty string under 500 characters" };
+  if (!MODES.includes(mode)) return { error: `mode must be one of: ${MODES.join(", ")}` };
+  if (!SCOPES.includes(scope)) return { error: `scope must be one of: ${SCOPES.join(", ")}` };
+  const pick = (v, known) => (typeof v === "string" && known.has(v.toUpperCase()) ? v.toUpperCase() : undefined);
+  return {
+    question: question.trim(),
+    mode,
+    scope,
+    sections: { lab: pick(sections.lab, SECTION_CODES.lab), tutorial: pick(sections.tutorial, SECTION_CODES.tutorial) },
+    retrieveOnly: retrieveOnly === true,
   };
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin");
     const allowed = [env.ALLOWED_ORIGIN, "http://localhost:8000", "http://127.0.0.1:8000"];
     const cors = {
       "Access-Control-Allow-Origin": allowed.includes(origin) ? origin : env.ALLOWED_ORIGIN,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       Vary: "Origin",
     };
@@ -102,21 +159,21 @@ export default {
       new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
-    if (request.method !== "POST") return json({ error: "POST a JSON body: {\"question\": \"...\"}" }, 405);
     if (origin && !allowed.includes(origin)) return json({ error: "Origin not allowed" }, 403);
+    if (request.method === "GET" && new URL(request.url).pathname === "/meta") return json(meta());
+    if (request.method !== "POST") return json({ error: "POST a JSON body: {\"question\": \"...\"}, or GET /meta" }, 405);
 
-    let question;
+    let body;
     try {
-      ({ question } = await request.json());
+      body = await request.json();
     } catch {
       return json({ error: "Invalid JSON" }, 400);
     }
-    if (typeof question !== "string" || !question.trim() || question.length > 500) {
-      return json({ error: "question must be a non-empty string under 500 characters" }, 400);
-    }
+    const req = parseRequest(body);
+    if (req.error) return json({ error: req.error }, 400);
 
     try {
-      return json(await answer(env, question.trim()));
+      return json(await ask(env, ctx, req));
     } catch (e) {
       return json({ error: "Upstream model error", detail: String(e.message || e) }, 502);
     }

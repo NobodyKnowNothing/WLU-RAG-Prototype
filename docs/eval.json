@@ -1,0 +1,39 @@
+{
+ "date": "2026-11-04",
+ "questions": 39,
+ "summary": "19 questions from the original evaluation set, the 4 admin questions from the project plan, 10 university-policy questions and 6 questions the sources cannot answer. Counts show how many questions each check applied to in that run.",
+ "metrics": {
+  "PC141 section retrieved (top 5)": {
+   "simple": "23/23 (100%)",
+   "full": "23/23 (100%)"
+  },
+  "Laurier page retrieved": {
+   "simple": "11/11 (100%)",
+   "full": "11/11 (100%)"
+  },
+  "Gives an answer (answerable questions)": {
+   "simple": "9/10 (90%)",
+   "full": "33/33 (100%)"
+  },
+  "Answer cites the right PC141 section": {
+   "simple": "4/4 (100%)",
+   "full": "23/23 (100%)"
+  },
+  "Answer cites the right Laurier page": {
+   "simple": "6/7 (86%)",
+   "full": "11/11 (100%)"
+  },
+  "Says it can't verify (unanswerable questions)": {
+   "simple": "4/4 (100%)",
+   "full": "6/6 (100%)"
+  },
+  "Statements whose quote checks out": {
+   "simple": "32/32 (100%)",
+   "full": "95/98 (97%)"
+  },
+  "Median seconds per answer": {
+   "simple": 4.9,
+   "full": 7.7
+  }
+ }
+}
