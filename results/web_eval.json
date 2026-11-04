@@ -927,12 +927,12 @@
    "mode": "simple",
    "kind": "retrieval",
    "date": "2026-11-04",
-   "url": "http://127.0.0.1:8787",
+   "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
    "rows": [
     {
      "id": "Q1",
      "group": "course",
-     "seconds": 0.5,
+     "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -951,7 +951,7 @@
     {
      "id": "Q2",
      "group": "course",
-     "seconds": 0.4,
+     "seconds": 0.8,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -970,7 +970,7 @@
     {
      "id": "Q3",
      "group": "course",
-     "seconds": 1.1,
+     "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -989,7 +989,7 @@
     {
      "id": "Q4",
      "group": "course",
-     "seconds": 0.9,
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1027,7 +1027,7 @@
     {
      "id": "Q6",
      "group": "course",
-     "seconds": 0.4,
+     "seconds": 1.3,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1046,7 +1046,7 @@
     {
      "id": "Q7",
      "group": "course",
-     "seconds": 10.5,
+     "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1065,7 +1065,7 @@
     {
      "id": "Q8",
      "group": "course",
-     "seconds": 0.4,
+     "seconds": 1.9,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1084,7 +1084,7 @@
     {
      "id": "Q9",
      "group": "course",
-     "seconds": 1.1,
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1103,7 +1103,7 @@
     {
      "id": "Q10",
      "group": "course",
-     "seconds": 0.9,
+     "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1141,7 +1141,7 @@
     {
      "id": "Q12",
      "group": "course",
-     "seconds": 0.4,
+     "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1160,7 +1160,7 @@
     {
      "id": "Q13",
      "group": "course",
-     "seconds": 1.2,
+     "seconds": 1.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1179,7 +1179,7 @@
     {
      "id": "Q14",
      "group": "course",
-     "seconds": 0.5,
+     "seconds": 1.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1198,7 +1198,7 @@
     {
      "id": "Q15",
      "group": "course",
-     "seconds": 0.5,
+     "seconds": 0.9,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1217,7 +1217,7 @@
     {
      "id": "Q16",
      "group": "course",
-     "seconds": 0.7,
+     "seconds": 1.1,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1236,7 +1236,7 @@
     {
      "id": "Q17",
      "group": "course",
-     "seconds": 0.8,
+     "seconds": 1.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1255,7 +1255,7 @@
     {
      "id": "Q18",
      "group": "course",
-     "seconds": 1.1,
+     "seconds": 0.9,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1274,7 +1274,7 @@
     {
      "id": "Q19",
      "group": "course",
-     "seconds": 1.0,
+     "seconds": 0.9,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1312,7 +1312,7 @@
     {
      "id": "E2",
      "group": "email",
-     "seconds": 0.4,
+     "seconds": 1.3,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1331,7 +1331,7 @@
     {
      "id": "E3",
      "group": "email",
-     "seconds": 1.2,
+     "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1350,7 +1350,7 @@
     {
      "id": "E4",
      "group": "email",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": true,
      "status": null,
@@ -1367,7 +1367,7 @@
     {
      "id": "L1",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1385,7 +1385,7 @@
     {
      "id": "L2",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 1.2,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1404,7 +1404,7 @@
     {
      "id": "L3",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1423,7 +1423,7 @@
     {
      "id": "L4",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.9,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1442,7 +1442,7 @@
     {
      "id": "L5",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 1.0,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1461,7 +1461,7 @@
     {
      "id": "L6",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1480,7 +1480,7 @@
     {
      "id": "L7",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1499,7 +1499,7 @@
     {
      "id": "L8",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.8,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1518,7 +1518,7 @@
     {
      "id": "L9",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1537,7 +1537,7 @@
     {
      "id": "L10",
      "group": "laurier",
-     "seconds": 0.0,
+     "seconds": 0.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1556,7 +1556,7 @@
     {
      "id": "P1",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 0.9,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1575,7 +1575,7 @@
     {
      "id": "P2",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1594,7 +1594,7 @@
     {
      "id": "P3",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 1.0,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1613,7 +1613,7 @@
     {
      "id": "P4",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 1.4,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1632,7 +1632,7 @@
     {
      "id": "P5",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 1.1,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1651,7 +1651,7 @@
     {
      "id": "P6",
      "group": "policy",
-     "seconds": 0.0,
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1668,7 +1668,7 @@
     {
      "id": "S1",
      "group": "search",
-     "seconds": 0.0,
+     "seconds": 1.2,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1687,7 +1687,7 @@
     {
      "id": "S2",
      "group": "search",
-     "seconds": 0.0,
+     "seconds": 1.2,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1706,7 +1706,7 @@
     {
      "id": "S3",
      "group": "search",
-     "seconds": 0.0,
+     "seconds": 0.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1725,7 +1725,7 @@
     {
      "id": "U1",
      "group": "unanswerable",
-     "seconds": 0.4,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -1744,7 +1744,7 @@
     {
      "id": "U2",
      "group": "unanswerable",
-     "seconds": 0.9,
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -1763,7 +1763,7 @@
     {
      "id": "U3",
      "group": "unanswerable",
-     "seconds": 0.9,
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -1779,7 +1779,7 @@
     {
      "id": "U4",
      "group": "unanswerable",
-     "seconds": 1.2,
+     "seconds": 0.8,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -1798,7 +1798,7 @@
     {
      "id": "U5",
      "group": "unanswerable",
-     "seconds": 0.4,
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
