@@ -37,6 +37,11 @@ def ask(url, item, mode, retrieve_only):
         time.sleep(5)
 
 
+def page_hit(source, want):
+    """A Laurier source from one of the expected pages, given as page ids or URL fragments."""
+    return source["kind"] == "laurier" and any(w == source.get("page") or w in source.get("url", "") for w in want)
+
+
 def section_hit(source, want):
     return source["kind"] == "pc141" and source["file"] == want["file"] and want["section"].lower() in source["section"].lower()
 
@@ -50,13 +55,13 @@ def score(item, r):
     want_pc, want_ul = item.get("pc141"), item.get("laurier")
     out = {
         "pc141_retrieved": any(section_hit(s, want_pc) for s in sources) if want_pc else None,
-        "laurier_retrieved": any(s.get("page") in want_ul for s in sources) if want_ul else None,
+        "laurier_retrieved": any(page_hit(s, want_ul) for s in sources) if want_ul else None,
     }
     if "status" in r:
         unanswerable = item["group"] == "unanswerable"
         out.update(
             pc141_cited=any(section_hit(s, want_pc) for s in cited) if want_pc else None,
-            laurier_cited=any(s.get("page") in want_ul for s in cited) if want_ul else None,
+            laurier_cited=any(page_hit(s, want_ul) for s in cited) if want_ul else None,
             refused=r["status"] == "not_found" if unanswerable else None,
             answered=r["status"] != "not_found" if not unanswerable else None,
             claims=len(claims),
@@ -97,13 +102,14 @@ def summarize(runs, items):
         table.setdefault("Statements whose quote checks out", {})[mode] = fmt((sum(r["verified_claims"] for r in answered), claims)) if claims else None
         secs = [r["seconds"] for r in answered]
         table.setdefault("Median seconds per answer", {})[mode] = round(statistics.median(secs), 1) if secs else None
-    groups = {g: sum(i["group"] == g for i in items) for g in ("course", "email", "laurier", "unanswerable")}
+    groups = {g: sum(i["group"] == g for i in items) for g in ("course", "email", "laurier", "policy", "search", "unanswerable")}
     return {
         "date": max(run["date"] for run in runs.values()),
         "questions": len(items),
         "summary": (
             f"{groups['course']} questions from the original evaluation set, the {groups['email']} admin questions from the project plan, "
-            f"{groups['laurier']} university-policy questions and {groups['unanswerable']} questions the sources cannot answer. "
+            f"{groups['laurier']} questions on key student pages, {groups['policy']} on other university policies, {groups['search']} that need Laurier's site search "
+            f"and {groups['unanswerable']} questions the sources cannot answer. "
             "Counts show how many questions each check applied to in that run."
         ),
         "metrics": table,

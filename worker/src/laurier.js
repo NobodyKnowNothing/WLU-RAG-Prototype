@@ -1,7 +1,14 @@
 // Official Laurier pages for university-wide policy. Pages are fetched live from wlu.ca when a
 // question needs them, split into sections, and kept for a few hours per Worker instance.
-import { htmlToSections } from "./html.js";
-import { BM25 } from "./retrieval.js";
+//
+// Pages come from three places, and the best sections across all of them are cited:
+//   1. PAGES: hand-picked student-facing pages with topic hints (below).
+//   2. Every university policy and procedure, from worker/src/policies.json (built from the
+//      wlu.ca sitemap by scripts/build_policy_index.mjs).
+//   3. Laurier's own site search, for any other public page on wlu.ca.
+import { decodeEntities, htmlToSections } from "./html.js";
+import policies from "./policies.json" with { type: "json" };
+import { BM25, tokenize } from "./retrieval.js";
 
 const CAL = "Undergraduate Academic Calendar 2026/27";
 const calendar = (q) => `https://academic-calendar.wlu.ca/${q}`;
@@ -151,66 +158,132 @@ export async function loadPage(entry, ctx) {
   return page;
 }
 
-const routeIndex = new BM25(PAGES.map((p) => `${p.title} ${p.topics}`));
+// How much weight a page carries: university policies and the Academic Calendar are the rules;
+// other Laurier pages explain them.
+export function authorityOf(url) {
+  if (url.startsWith("https://www.wlu.ca/about/governance/")) return "policy";
+  if (url.startsWith("https://academic-calendar.wlu.ca/")) return "calendar";
+  return "guidance";
+}
+
+const policyByUrl = new Map(policies.map((p) => [p.url, p]));
+const revisedOf = (url) => {
+  const r = policyByUrl.get(url)?.revised;
+  return r && !/^n\/?a$/i.test(r) ? r : undefined;
+};
+const curated = new Set(PAGES.map((p) => p.url));
+// Hand-picked pages first, then every policy and procedure that isn't already one of them.
+export const CATALOG = [
+  ...PAGES,
+  ...policies
+    .filter((p) => !curated.has(p.url))
+    .map((p) => ({
+      id: `policy:${p.slug.replace(/\.html$/, "")}`,
+      title: p.title,
+      publisher: "Laurier University Policies",
+      url: p.url,
+      topics: `${p.kind}${p.number ? ` ${p.number}` : ""} ${p.summary}`,
+    })),
+].map((p) => ({ ...p, authority: authorityOf(p.url), revised: revisedOf(p.url) }));
+
+const routeIndex = new BM25(CATALOG.map((p) => `${p.title} ${p.topics}`));
 const pageText = (p) => `${p.title}. ${p.topics}`;
 
-// Picks the pages worth fetching for a question: keyword matches against each page's topics that
-// score close to the best one, plus (in full mode) the cross-encoder's top picks by rank.
+// Picks the pages worth fetching for a question: keyword matches against each page's title and
+// topics that score close to the best one, plus (in full mode) the cross-encoder's top picks among
+// the keyword candidates and the hand-picked pages.
 async function routePages(query, mode, rerank) {
-  const lexical = routeIndex.rank(query, 3);
+  const lexical = routeIndex.rank(query, ROUTE_POOL);
   const best = lexical[0]?.[1] || 0;
-  const picked = lexical.filter(([, s]) => s >= Math.max(ROUTE_MIN_BM25, best * 0.6)).map(([i]) => i);
+  const picked = lexical.slice(0, 4).filter(([, s]) => s >= Math.max(ROUTE_MIN_BM25, best * 0.6)).map(([i]) => i);
   if (mode !== "simple") {
-    const scored = await rerank(query, PAGES.map(pageText));
-    picked.push(...scored.filter((r) => r.score >= ROUTE_MIN_RERANK).slice(0, 2).map((r) => r.index));
+    const pool = [...new Set([...lexical.map(([i]) => i), ...PAGES.keys()])];
+    const scored = await rerank(query, pool.map((i) => pageText(CATALOG[i])));
+    picked.push(...scored.filter((r) => r.score >= ROUTE_MIN_RERANK).slice(0, 2).map((r) => pool[r.index]));
   }
-  return [...new Set(picked)].slice(0, 4).map((i) => PAGES[i]);
+  return [...new Set(picked)].slice(0, 5).map((i) => CATALOG[i]);
 }
+const ROUTE_POOL = 20;
 const ROUTE_MIN_BM25 = 1.5;
 const ROUTE_MIN_RERANK = 0.001;
 const SECTION_MIN_RERANK = 0.01;
-const RERANK_POOL = 30;
+const RERANK_POOL = 40;
+const PER_PAGE_POOL = 6;
 
 const deepLink = (url, s) => (s.anchor ? `${url}#${s.anchor}` : s.heading ? `${url}#:~:text=${encodeURIComponent(s.heading)}` : url);
 
-// Returns { sources, pages }: the best sections (as citable sources) and which pages were checked.
-export async function searchLaurier(query, { mode, k, ctx, rerank }) {
+// ---- Laurier site search -------------------------------------------------------------------
+// The endpoint behind wlu.ca's own search box. It is not a published API, so it gets one request
+// per question (like a student using the search box), results are cached for 6 hours, and
+// SITE_SEARCH = "off" in wrangler.jsonc turns it off.
+const SEARCH_API = "https://wlu.ca/_ato/_common/search-overlay/php/search-api.php";
+const READABLE_HOSTS = /^https:\/\/(www\.|students\.|academic-calendar\.)?wlu\.ca\//;
+const FILE = /\.(pdf|docx?|xlsx?|pptx?)(\?|$)|qualtrics\.com/i;
+const searches = new Map(); // query -> { at, results }
+
+export function parseSearchResults(html) {
+  const results = [];
+  for (const li of String(html || "").split(/<li\b[^>]*class="search-result"/).slice(1)) {
+    const a = li.match(/<a\b[^>]*class="search-title"[^>]*>([\s\S]*?)<\/a>/);
+    const href = a && a[0].match(/\bhref="([^"]+)"/);
+    if (!href) continue;
+    const strip = (s) => decodeEntities(s.replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim();
+    const snippet = li.match(/class="search-snippet"[^>]*>([\s\S]*?)<\/div>/);
+    results.push({ title: strip(a[1]).split(" | ")[0], url: decodeEntities(href[1]), snippet: snippet ? strip(snippet[1]) : "" });
+  }
+  return results;
+}
+
+async function siteSearch(question) {
+  const query = (question.toLowerCase().match(/[a-z0-9]+/g) || []).filter((w) => tokenize(w).length).join(" ");
+  const hit = searches.get(query);
+  if (hit && hit.at + TTL_S * 1000 > Date.now()) return hit.results;
+  const res = await fetch(SEARCH_API, {
+    method: "POST",
+    headers: { "User-Agent": USER_AGENT, "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ query, page: "1", search_filter: "", search_sort: "" }),
+  });
+  if (!res.ok) throw new Error(`site search HTTP ${res.status}`);
+  const results = parseSearchResults((await res.json()).search_results);
+  searches.set(query, { at: Date.now(), results });
+  return results;
+}
+
+// Returns { sources, pages, links }: the best sections (as citable sources), which pages were
+// checked, and files or forms the site search found but that can't be read and quoted.
+export async function searchLaurier(query, { question = query, mode, k, ctx, rerank, siteSearchOn = true }) {
   const entries = await routePages(query, mode, rerank);
-  const loaded = await Promise.all(
-    entries.map((entry) =>
-      loadPage(entry, ctx).then(
-        (page) => ({ entry, page }),
-        (e) => ({ entry, error: String(e.message || e) })
-      )
-    )
-  );
-  const pages = loaded.map(({ entry, page, error }) => ({
+  // Keyword overlap can't tell a page that answers the question from one that merely mentions its
+  // words ("order a transcript" vs the policy on what a transcript contains), so Laurier's own
+  // search runs alongside the catalog and the section ranking below picks from both.
+  const have = new Set(entries.map((e) => e.url));
+  const attempt = (p) => p.catch((e) => ({ loaded: [], links: [], error: String(e.message || e) }));
+  const [catalogPages, search] = await Promise.all([loadAll(entries, ctx), siteSearchOn ? attempt(fromSiteSearch(question, have, ctx)) : null]);
+  const loaded = [...catalogPages, ...(search?.loaded || [])];
+  const { secs, ranked } = await rankSections(loaded, query, mode, k, rerank);
+  const links = search?.links || [];
+  const searchError = search?.error;
+
+  const pages = loaded.map(({ entry, page, error, viaSearch }) => ({
     id: entry.id,
     title: entry.title,
     publisher: entry.publisher,
     url: entry.url,
+    authority: entry.authority,
+    ...(viaSearch && { viaSearch }),
     ...(page ? { fetchedAt: page.fetchedAt, sections: page.sections.length } : { error }),
   }));
-  const secs = loaded.flatMap(({ entry, page }) => (page ? page.sections.map((s) => ({ s, entry, page })) : []));
-  if (!secs.length) return { sources: [], pages };
-
-  const docText = ({ s, entry }) => `${entry.title} | ${s.path.join(" > ")}\n${s.text}`;
-  const lexical = new BM25(secs.map(docText)).rank(query);
-  let ranked;
-  if (mode === "simple") {
-    ranked = lexical.slice(0, k).map(([i, score]) => ({ i, score }));
-  } else {
-    const pool = [...new Set([...lexical.map(([i]) => i), ...secs.keys()])].slice(0, RERANK_POOL);
-    const scored = await rerank(query, pool.map((i) => docText(secs[i])));
-    ranked = scored.filter((r) => r.score >= SECTION_MIN_RERANK).slice(0, k).map((r) => ({ i: pool[r.index], score: r.score }));
-  }
+  if (searchError) pages.push({ id: "site-search", title: "Laurier site search", url: "https://www.wlu.ca/search.html", error: searchError });
   const sources = ranked.map(({ i, score }) => {
-    const { s, entry, page } = secs[i];
+    const { s, entry, page, viaSearch } = secs[i];
     return {
       kind: "laurier",
       pageId: entry.id,
       title: entry.title,
       publisher: entry.publisher,
+      authority: entry.authority,
+      ...(entry.revised && { revised: entry.revised }),
+      ...(viaSearch && { viaSearch }),
       section: s.path.join(" > "),
       url: deepLink(entry.url, s),
       fetchedAt: page.fetchedAt,
@@ -218,5 +291,55 @@ export async function searchLaurier(query, { mode, k, ctx, rerank }) {
       score,
     };
   });
-  return { sources, pages };
+  return { sources, pages, links };
+}
+
+// Reads the top two web pages the site search finds (that aren't already loaded) and lists the
+// files and forms it finds as links, since those can't be read and quoted.
+async function fromSiteSearch(question, have, ctx) {
+  const results = (await siteSearch(question)).filter((r) => READABLE_HOSTS.test(r.url) || FILE.test(r.url));
+  const wantsFile = /\b(forms?|application|template|pdf|documents?|files?|rubrics?)\b/i.test(question);
+  const links = wantsFile ? results.filter((r) => FILE.test(r.url)).slice(0, 3).map(({ title, url }) => ({ title, url })) : [];
+  const extra = results
+    .filter((r) => !FILE.test(r.url) && !have.has(r.url.split("#")[0]))
+    .slice(0, 2)
+    .map((r) => CATALOG.find((p) => p.url === r.url) || { id: `search:${r.url}`, title: r.title, publisher: new URL(r.url).hostname.replace(/^www\./, ""), url: r.url, authority: authorityOf(r.url), revised: revisedOf(r.url) });
+  return { loaded: await loadAll(extra, ctx, true), links };
+}
+
+const loadAll = (entries, ctx, viaSearch = false) =>
+  Promise.all(
+    entries.map((entry) =>
+      loadPage(entry, ctx).then(
+        (page) => ({ entry, page, viaSearch }),
+        (e) => ({ entry, error: String(e.message || e), viaSearch })
+      )
+    )
+  );
+
+async function rankSections(loaded, query, mode, k, rerank) {
+  const secs = loaded.flatMap(({ entry, page, viaSearch }) => (page ? page.sections.map((s) => ({ s, entry, page, viaSearch })) : []));
+  if (!secs.length) return { secs, ranked: [] };
+  const docText = ({ s, entry }) => `${entry.title} | ${s.path.join(" > ")}\n${s.text}`;
+  const lexical = new BM25(secs.map(docText)).rank(query);
+  if (mode === "simple") {
+    // Keyword scores aren't comparable across unrelated pages (a co-op page that repeats "code of
+    // conduct" can outscore the policy itself), so site search results get one slot, not all.
+    const catalog = lexical.filter(([i]) => !secs[i].viaSearch);
+    const web = lexical.filter(([i]) => secs[i].viaSearch);
+    const picked = [...catalog.slice(0, k - Math.min(1, web.length)), ...web].slice(0, k);
+    return { secs, ranked: picked.map(([i, score]) => ({ i, score })) };
+  }
+  // Each page's best few sections go to the cross-encoder, so one page that repeats the question's
+  // words can't crowd the others out of the pool.
+  const perPage = new Map();
+  for (const i of [...lexical.map(([i]) => i), ...secs.keys()]) {
+    const url = secs[i].entry.url;
+    if (!perPage.has(url)) perPage.set(url, []);
+    const list = perPage.get(url);
+    if (list.length < PER_PAGE_POOL && !list.includes(i)) list.push(i);
+  }
+  const pool = [...perPage.values()].flat().slice(0, RERANK_POOL);
+  const scored = await rerank(query, pool.map((i) => docText(secs[i])));
+  return { secs, ranked: scored.filter((r) => r.score >= SECTION_MIN_RERANK).slice(0, k).map((r) => ({ i: pool[r.index], score: r.score })) };
 }

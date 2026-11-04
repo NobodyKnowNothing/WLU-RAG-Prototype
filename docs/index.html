@@ -75,6 +75,8 @@
   .src .meta { display:block; font-size:.8rem; color:var(--muted); }
   .src .meta a { color:inherit; }
   .src p { white-space:pre-wrap; font-size:.86rem; color:var(--muted); margin:8px 0 0; }
+  .src .kind { display:inline-block; font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; padding:1px 6px; margin-right:6px; border-radius:4px; color:var(--uni); background:var(--uni-bg); }
+  .src .kind.guidance { color:var(--muted); background:var(--no-bg); }
   .pages { font-size:.85rem; color:var(--muted); }
   .pages a { color:inherit; }
   .error { color:var(--bad); }
@@ -110,7 +112,7 @@
 
   <details class="about" id="about">
     <summary>How it works and how accurate it is</summary>
-    <p><strong>Sources.</strong> PC141 course rules come from the course PDFs in the repository (syllabus, MyLearningSpace announcements, lab manual), split by section. University-wide information comes from official Laurier pages (the 2026/27 Undergraduate Academic Calendar, students.wlu.ca and Laurier's policy pages). The assistant fetches those pages live from wlu.ca when a question needs them, and keeps a copy for up to 6 hours.</p>
+    <p><strong>Sources.</strong> PC141 course rules come from the course PDFs in the repository (syllabus, MyLearningSpace announcements, lab manual), split by section. University-wide information comes from official Laurier pages: key 2026/27 Undergraduate Academic Calendar and students.wlu.ca pages, every university policy and procedure in Laurier's policy register, and, when none of those fit, any other public page that Laurier's own site search finds. The assistant fetches those pages live from wlu.ca when a question needs them and keeps a copy for up to 6 hours. Each source is marked as a university policy, the Academic Calendar or a guidance page.</p>
     <p><strong>Verification.</strong> The model must give each statement a source and an exact supporting quote. Statements with no valid source are removed. Statements whose quote isn't in the cited section, or that mention a number, time or email the section doesn't contain, are marked unverified.</p>
     <p><strong>Retrieval.</strong> <em>Simple</em> is keyword search (BM25). <em>Full</em> adds embeddings, fuses both with reciprocal rank fusion and reranks with a cross-encoder.</p>
     <div id="eval"><p class="muted">Loading evaluation results…</p></div>
@@ -177,6 +179,7 @@
     partial: ["◐", "Partly verified", ""],
     not_found: ["✕", "Couldn't verify an answer", ""],
   };
+  const AUTHORITY = { policy: "University policy", calendar: "Academic Calendar", guidance: "Guidance page" };
   const when = (iso) => new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
   const safeUrl = (u) => (/^https:\/\//.test(u) ? u : "#");
 
@@ -213,7 +216,10 @@
     const pages = s.pages?.length ? `${s.pages.length > 1 ? "pp." : "p."} ${s.pages.join(", ")}` : "";
     const meta = pc
       ? el("span", { className: "meta", textContent: ["PC141 course document", s.file, pages].filter(Boolean).join(" · ") })
-      : el("span", { className: "meta" }, `${s.publisher} · fetched ${when(s.fetchedAt)} · `, el("a", { href: safeUrl(s.url), target: "_blank", rel: "noopener", textContent: "open on wlu.ca ↗" }));
+      : el("span", { className: "meta" },
+          el("span", { className: `kind ${s.authority}`, textContent: AUTHORITY[s.authority] || AUTHORITY.guidance }),
+          [s.publisher, s.revised && `last revised ${s.revised}`, s.viaSearch && "found by Laurier site search", `fetched ${when(s.fetchedAt)}`].filter(Boolean).join(" · ") + " · ",
+          el("a", { href: safeUrl(s.url), target: "_blank", rel: "noopener", textContent: "open on wlu.ca ↗" }));
     return el("details", { className: `src ${s.kind}${cited ? "" : " uncited"}`, id: `src-${s.n}` },
       el("summary", {}, el("span", { className: "n", textContent: `[${s.n}]` }), el("span", { className: "doc", textContent: s.title }),
         el("span", { className: "sec", textContent: `Section: ${s.section}` }), meta),
@@ -239,8 +245,10 @@
         data.scope !== "laurier" && panel("pc141", data.pc141), data.scope !== "pc141" && panel("laurier", data.laurier)),
       el("h3", { textContent: `Sources (${cited.size} cited, ${data.sources.length} searched)` }),
       ...ordered.map((s) => sourceCard(s, cited.has(s.n))),
-      pages.length && el("p", { className: "pages" }, "Laurier pages checked: ",
-        ...pages.flatMap((p, i) => [i ? ", " : "", el("a", { href: safeUrl(p.url), target: "_blank", rel: "noopener", textContent: p.title }), p.error ? ` (unavailable: ${p.error})` : ""])),
+      pages.length > 0 && el("p", { className: "pages" }, "Laurier pages checked: ",
+        ...pages.flatMap((p, i) => [i ? ", " : "", el("a", { href: safeUrl(p.url), target: "_blank", rel: "noopener", textContent: p.title }), p.viaSearch ? " (via site search)" : "", p.error ? ` (unavailable: ${p.error})` : ""])),
+      data.laurierLinks?.length > 0 && el("p", { className: "pages" }, "Related files and forms (found by Laurier site search, not read): ",
+        ...data.laurierLinks.flatMap((l, i) => [i ? ", " : "", el("a", { href: safeUrl(l.url), target: "_blank", rel: "noopener", textContent: l.title })])),
       el("p", { className: "muted", textContent: `${data.mode === "simple" ? "Simple" : "Full"} retrieval · ${((data.timings.retrieveMs + (data.timings.generateMs || 0)) / 1000).toFixed(1)} s` })
     );
   }

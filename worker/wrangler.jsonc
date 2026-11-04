@@ -3,5 +3,9 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "ai": { "binding": "AI" },
-  "vars": { "ALLOWED_ORIGIN": "https://nobodyknownothing.github.io" }
+  "vars": {
+    "ALLOWED_ORIGIN": "https://nobodyknownothing.github.io",
+    // "off" stops the Worker from querying wlu.ca's site search (see src/laurier.js)
+    "SITE_SEARCH": "on"
+  }
 }

@@ -1,7 +1,7 @@
 import chunks from "./chunks.json"; // built by scripts/export_chunks.py
 import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
 import { RESPONSE_SCHEMA, SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
-import { PAGES, searchLaurier } from "./laurier.js";
+import { CATALOG, searchLaurier } from "./laurier.js";
 import { BM25, cosine, expandQuery, rrf } from "./retrieval.js";
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
@@ -70,10 +70,10 @@ async function retrieve(env, ctx, { question, mode, scope, sections }) {
   const query = expandQuery([question, sections.lab && `PC141-${sections.lab}`, sections.tutorial && `PC141-${sections.tutorial}`].filter(Boolean).join(" "));
   const [course, laurier] = await Promise.all([
     scope === "laurier" ? [] : searchCourse(env, query, mode),
-    scope === "pc141" ? { sources: [], pages: [] } : searchLaurier(expandQuery(question), { mode, k: LAURIER_TOP_N, ctx, rerank: (q, t) => rerank(env, q, t) }),
+    scope === "pc141" ? { sources: [], pages: [], links: [] } : searchLaurier(expandQuery(question), { question, mode, k: LAURIER_TOP_N, ctx, rerank: (q, t) => rerank(env, q, t), siteSearchOn: env.SITE_SEARCH !== "off" }),
   ]);
   const sources = [...course.map((c) => ({ ...c, kind: "pc141" })), ...laurier.sources].map((s, i) => ({ n: i + 1, ...s }));
-  return { sources, pages: laurier.pages };
+  return { sources, pages: laurier.pages, links: laurier.links || [] };
 }
 
 async function generate(env, question, sources, sections) {
@@ -99,16 +99,16 @@ async function generate(env, question, sources, sections) {
   return out;
 }
 
-const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, fetchedAt, text, intro, score }) =>
+const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, authority, revised, viaSearch, fetchedAt, text, intro, score }) =>
   kind === "pc141"
     ? { n, kind, title, section, pages, file: source, text, ...(intro && { intro }), score }
-    : { n, kind, title, section, page: pageId, publisher, url, fetchedAt, text, score };
+    : { n, kind, title, section, page: pageId, publisher, authority, ...(revised && { revised }), ...(viaSearch && { viaSearch }), url, fetchedAt, text, score };
 
 async function ask(env, ctx, req) {
   const t0 = Date.now();
-  const { sources, pages } = await retrieve(env, ctx, req);
+  const { sources, pages, links } = await retrieve(env, ctx, req);
   const t1 = Date.now();
-  const base = { mode: req.mode, scope: req.scope, sources: sources.map(publicSource), laurierPages: pages };
+  const base = { mode: req.mode, scope: req.scope, sources: sources.map(publicSource), laurierPages: pages, laurierLinks: links };
   if (req.retrieveOnly) return { ...base, timings: { retrieveMs: t1 - t0 } };
   // Nothing relevant anywhere: say so without asking the model to improvise.
   const result = sources.length
@@ -122,7 +122,7 @@ function meta() {
   for (const c of chunks) docs.set(c.source, { file: c.source, title: c.title, sections: (docs.get(c.source)?.sections || 0) + 1 });
   return {
     pc141: [...docs.values()],
-    laurier: PAGES.map(({ id, title, publisher, url }) => ({ id, title, publisher, url })),
+    laurier: CATALOG.map(({ id, title, publisher, url, authority, revised }) => ({ id, title, publisher, url, authority, ...(revised && { revised }) })),
     sectionCodes: { lab: [...SECTION_CODES.lab].sort(), tutorial: [...SECTION_CODES.tutorial].sort() },
     modes: MODES,
     scopes: SCOPES,

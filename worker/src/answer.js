@@ -3,14 +3,14 @@ export const SYSTEM_PROMPT = `You are the PC141 course assistant for students at
 
 There are two kinds of source:
 - PC141 sources are the course's own documents (syllabus, MyLearningSpace announcements, lab manual). They set the rules for this course.
-- LAURIER sources are official Laurier web pages with university-wide regulations and services.
+- LAURIER sources are official Laurier web pages with university-wide rules. Each is marked as a university policy or the Academic Calendar (the rules themselves) or a guidance page (which explains them).
 
 Rules:
 1. Use only facts stated in the sources. Never add outside knowledge, assumptions or what is typical elsewhere, and do not draw conclusions a source does not state (if a tool is "not approved", do not say it is "not allowed"). If you are not sure a source says something, leave it out.
 2. Write short, self-contained claims that stay close to the source's wording. Each claim lists the numbers of the sources that state it, and "quote" holds the exact words from one of those sources that support it, copied character for character. Copy numbers, dates, times, rooms, percentages and email addresses exactly as written. Be complete: include every relevant rule the sources give, not just the first one you find.
-3. Claims from PC141 sources go in "pc141"; claims from LAURIER sources go in "laurier". Never present a university rule as a PC141 rule, or the reverse.
+3. Claims from PC141 sources go in "pc141"; claims from LAURIER sources go in "laurier". A claim cites sources of one kind only: if a course rule and a university rule cover the same topic, write two claims. Never present a university rule as a PC141 rule, or the reverse.
 4. Set status to "answered" when the sources answer what the student asked. Use "partial" only when part of the question itself cannot be answered from the sources, and "not_found" when none of it can (then leave both lists empty). Use "unverified" only to name the parts of the question you could not answer; otherwise leave it empty. Do not speculate about other rules that might exist, never guess, and do not write claims that only say something is missing.
-5. If two sources give different answers about the same thing (for example different dates, rooms, or weekly versus alternate weeks), give each version with its citation and say that they conflict. Different rules for different situations are not a conflict.
+5. If two sources give different answers about the same thing (for example different dates, rooms, or weekly versus alternate weeks), give each version with its citation and say that they conflict. Different rules for different situations are not a conflict. When a guidance page disagrees with a university policy or the Academic Calendar, give the policy or calendar version first.
 6. For schedules, the day, date, time, room and how often sessions run are separate facts: give each one the sources state, even when they come from different sources. If the answer depends on the student's lab or tutorial section and none is given, say so and list the options the sources give.
 7. If a source states a closely related rule (for example the rule for tutorials when the student asks about assignments), include it and say exactly what it applies to. Ignore sources that are not relevant.
 
@@ -39,13 +39,14 @@ export const RESPONSE_SCHEMA = {
 };
 
 const pagesLabel = (pages) => (pages?.length ? `, ${pages.length > 1 ? "pp." : "p."} ${pages.join(", ")}` : "");
+const AUTHORITY = { policy: "university policy", calendar: "Academic Calendar", guidance: "guidance page" };
 export const sourceLabel = (s) =>
   s.kind === "pc141" ? `${s.title} > ${s.section}${pagesLabel(s.pages)}` : `${s.title} > ${s.section} (${s.publisher})`;
 
 export function buildUserMessage(question, sources, sections) {
   const profile = [sections?.lab && `lab PC141-${sections.lab}`, sections?.tutorial && `tutorial PC141-${sections.tutorial}`].filter(Boolean);
   const blocks = sources.map(
-    (s) => `[${s.n}] ${s.kind === "pc141" ? "PC141" : "LAURIER"} | ${sourceLabel(s)}\n${s.intro ? `(Announcement opening: ${s.intro})\n` : ""}${s.text}`
+    (s) => `[${s.n}] ${s.kind === "pc141" ? "PC141" : `LAURIER, ${AUTHORITY[s.authority] || AUTHORITY.guidance}${s.revised ? `, last revised ${s.revised}` : ""}`} | ${sourceLabel(s)}\n${s.intro ? `(Announcement opening: ${s.intro})\n` : ""}${s.text}`
   );
   return [
     profile.length ? `Student's registered sections: ${profile.join(", ")}` : "The student has not said which lab or tutorial section they are in.",
@@ -107,15 +108,20 @@ export function verifyAnswer(raw, sources) {
         continue;
       }
       const kinds = new Set(cited.map((n) => byN.get(n).kind));
-      const home = kinds.has(bucket) ? bucket : [...kinds][0]; // a claim lives with the kind of source it cites
       const citedText = cited.map((n) => `${byN.get(n).intro || ""}\n${byN.get(n).text}`);
       const quote = String(c?.quote || "").trim();
+      // A claim lives with the kind of source it cites; one citing both goes where its quote is from.
+      const quoted = cited.find((n, i) => quoteFound(quote, [citedText[i]]));
+      const home = kinds.size > 1 && quoted ? byN.get(quoted).kind : kinds.has(bucket) ? bucket : [...kinds][0];
       const have = factsIn(cited.map((n, i) => `${byN.get(n).title} ${byN.get(n).section} ${citedText[i]}`).join("\n"));
       const missing = checkableFacts(text).filter((f) => !have.has(f));
       const claim = { text, quote, sources: cited, verified: true };
-      if (!quoteFound(quote, citedText)) {
+      if (!quoted) {
         claim.verified = false;
         claim.issue = "supporting quote not found in the cited section";
+      } else if (kinds.size > 1) {
+        claim.verified = false;
+        claim.issue = "mixes a PC141 rule with a university rule; check both sources";
       } else if (missing.length) {
         claim.verified = false;
         claim.issue = `${missing.map((m) => `"${m}"`).join(", ")} not found in the cited section`;
