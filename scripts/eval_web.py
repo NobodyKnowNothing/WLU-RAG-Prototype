@@ -26,7 +26,7 @@ def ask(url, item, mode, retrieve_only):
     body = {"question": item["question"], "mode": mode, "scope": "both", "retrieveOnly": retrieve_only}
     if item.get("sections"):
         body["sections"] = item["sections"]
-    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "User-Agent": "pc141-eval/1.0"})  # Cloudflare blocks Python-urllib's default agent
     for attempt in range(3):
         try:
             with urllib.request.urlopen(req, timeout=180) as res:
