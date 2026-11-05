@@ -150,3 +150,7 @@ cd worker && npx wrangler deploy                 # redeploy the API
 ```
 
 The Worker only accepts browser requests from the Pages origin (`ALLOWED_ORIGIN` in `worker/wrangler.jsonc`) and from localhost:8000. The Python CLI still uses Gemma through the Gemini API with page-level chunks; the web demo uses different models and section-level chunks, so its answers can differ.
+
+## Policy index: every Laurier policy, by section
+
+`policy_index/` is a vector index of all 183 Laurier policy, procedure, Academic Calendar and student pages, split into 2,390 citable sections. It is not wired into the Worker yet. A weekly job (`.github/workflows/policy-index.yml`) re-checks wlu.ca and re-embeds only the sections that changed. Agents can search it over HTTP or MCP, locally or from a Cloudflare Worker backed by D1 and Vectorize on the free plan. Each result cites one section (*12.2 Student Code of Conduct: Academic Misconduct > 4.04 Penalties for Academic Misconduct, 4.04.01*) with a link that scrolls to it. See [policy_index/README.md](policy_index/README.md) for the design and measurements, and [policy_index/HOSTING.md](policy_index/HOSTING.md) for the comparison of free vector-database hosts.

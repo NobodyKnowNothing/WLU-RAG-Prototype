@@ -1,0 +1,896 @@
+{
+ "hybrid": {
+  "date": "2026-11-05",
+  "summary": {
+   "questions": 17,
+   "top3": 17,
+   "top5": 17,
+   "reranked": false,
+   "dense": true
+  },
+  "rows": [
+   {
+    "id": "E4",
+    "question": "What are the plagiarism rules?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2",
+     "misconduct-procedures"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic Misconduct Defined > Types of Academic Misconduct > Self-Plagiarism",
+     "Gen AI Student Resource Hub > Gen AI and Academic Integrity > Don't Plagiarize",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+     "11.14 Policy for the Responsible Conduct of Research > 2.00 Definitions, 2.04.02–2.04.06",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A. Misappropriation of Another’s Work"
+    ],
+    "ms": 609
+   },
+   {
+    "id": "L1",
+    "question": "How do I request a deferred final exam?",
+    "want": [
+     "deferred-exams",
+     "exams",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Deferred Final Exams > Three Exams Within 24 Hours",
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds",
+     "Examinations > Religious Accommodations and Final Examination Scheduling",
+     "Examinations > Final University Examinations",
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Final Exam Deferral"
+    ],
+    "ms": 26
+   },
+   {
+    "id": "L2",
+    "question": "What counts as academic misconduct at Laurier?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic Misconduct Defined > Academic Misconduct",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Falsifying, Misrepresenting or Forging an Academic Record or Supporting Document",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 2.00 Definitions, 2.01–2.03",
+     "Procedures for Student Code of Conduct: Academic Misconduct > Procedures for Investigation and Adjudication in Cases of Academic Misconduct",
+     "6.1 Prevention of Harassment, Discrimination and Sexual Misconduct > 2.00 Definitions, 2.12.01–2.16"
+    ],
+    "ms": 26
+   },
+   {
+    "id": "L3",
+    "question": "What is the last day to drop a fall term course without failure?",
+    "want": [
+     "dates-fall",
+     "add-drop"
+    ],
+    "rank": 1,
+    "top": [
+     "Adding and Dropping Courses > Overview",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+     "Adding and Dropping Courses > Overview",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > August, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > April, 2027"
+    ],
+    "ms": 28
+   },
+   {
+    "id": "L4",
+    "question": "How do I register for academic accommodations for a disability?",
+    "want": [
+     "accessible-learning",
+     "policy-2-3"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of Students, 20.00",
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Definitions, 6.00–7.00",
+     "Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning, 1.00–2.01",
+     "Examinations > Students with Disabilities: Examinations and Tests",
+     "Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning, 2.02–2.04"
+    ],
+    "ms": 25
+   },
+   {
+    "id": "L5",
+    "question": "Is ChatGPT an approved AI tool at Laurier?",
+    "want": [
+     "gen-ai"
+    ],
+    "rank": 1,
+    "top": [
+     "Gen AI Student Resource Hub > Which Tools Should I Use at Laurier?",
+     "Academic Petitions and Appeals > Academic Petition Process > Generative AI Tools & Petition Submissions",
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds > Generative AI Tools & Deferred Examination Petition Submissions",
+     "Gen AI Student Resource Hub > Gen AI and Academic Integrity > Acknowledge Use > Acknowledgement Statements with Examples",
+     "9.6 Use, Procurement, and Development of Generative Artificial Intelligence > 4.00 Policy > 4.03 Procurement, Acquisition, and/or Development of GenAI Technology, 4.03.01"
+    ],
+    "ms": 26
+   },
+   {
+    "id": "L6",
+    "question": "I was sick for a few days and missed classes. What does Laurier say I should do?",
+    "want": [
+     "disruptions",
+     "student-regulations"
+    ],
+    "rank": 1,
+    "top": [
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+     "Academic Petitions and Appeals > Academic Petition Process > Documentation > Medical Documentation Expectations",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 5.0 When the University or individual campus or location stays open in severe weather",
+     "Student Regulations > Medical Excuse Slips"
+    ],
+    "ms": 29
+   },
+   {
+    "id": "L7",
+    "question": "How do I appeal my final grade?",
+    "want": [
+     "grades",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Grade Appeal Request",
+     "Grades > Final Grade Appeals",
+     "Grades > Final Grade Appeals",
+     "Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > Step 1: Instructor",
+     "Examinations > Deferred Examination Policy"
+    ],
+    "ms": 16
+   },
+   {
+    "id": "L8",
+    "question": "When is reading week in the fall 2026 term?",
+    "want": [
+     "dates-fall"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > October, 2026",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > November, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > February, 2027",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > July, 2026",
+     "Accessible Learning > Accommodations > Deadlines"
+    ],
+    "ms": 19
+   },
+   {
+    "id": "L9",
+    "question": "What happens if I have three final exams within 24 hours?",
+    "want": [
+     "exams",
+     "deferred-exams"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Deferred Final Exams > Three Exams Within 24 Hours",
+     "Deferred Exams > Faculty-Specific Forms and Information > Lazaridis School of Business and Economics > Three Exams Within 24 Hours",
+     "Examinations > Final University Examinations",
+     "Examinations > Final University Examinations",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 6.0 Cancellation of classes and/or examinations without closure of the University or individual campus or location"
+    ],
+    "ms": 21
+   },
+   {
+    "id": "L10",
+    "question": "What is the penalty for a first academic misconduct offence at Laurier?",
+    "want": [
+     "policy-12-2",
+     "misconduct-procedures",
+     "/procedures-for-student-code-of-conduct.html"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > Factors to Consider When Imposing Penalties",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A First Offence",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 5.0 First Offence of Academic Misconduct: Application of Penalty",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 6.0 Subsequent (Second or Greater) Offence of Academic Misconduct: Application of Penalty",
+     "Academic Misconduct Procedures > Penalties for Academic Misconduct"
+    ],
+    "ms": 20
+   },
+   {
+    "id": "P1",
+    "question": "What does Laurier's Non-Academic Student Code of Conduct cover?",
+    "want": [
+     "12.3-non-academic"
+    ],
+    "rank": 1,
+    "top": [
+     "12.3 Non-Academic Student Code of Conduct > 2.00 Purpose, 2.01–2.02",
+     "12.3 Non-Academic Student Code of Conduct > 1.00 Preamble, 1.01–1.02",
+     "Procedures for Non-Academic Student Code of Conduct > 1.0. Reporting",
+     "Procedures for Non-Academic Student Code of Conduct > 12.0. Outcomes for Non-Academic Misconduct",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Relevant Legislation"
+    ],
+    "ms": 24
+   },
+   {
+    "id": "P2",
+    "question": "What is Laurier's student mental health policy for?",
+    "want": [
+     "12.5-student-mental-health"
+    ],
+    "rank": 1,
+    "top": [
+     "12.5 Student Mental Health Policy > 1.00 Purpose, 1.01–1.02",
+     "12.5 Student Mental Health Policy > 11.00 Community of Care, 11.01",
+     "Procedures for Student Mental Health Policy (12.5) > Overview",
+     "10.1 Privacy Protection and Information Access Policy > 4.00 Policy > 4.03 Personal Health Information > 4.03.03 Collection, Use and Disclosure of Personal Health Information",
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Relevant Legislation"
+    ],
+    "ms": 23
+   },
+   {
+    "id": "P3",
+    "question": "Can instructors restrict electronic devices in class under Laurier policy?",
+    "want": [
+     "9.3-classroom-use-of-electronic-devices"
+    ],
+    "rank": 1,
+    "top": [
+     "9.3 Classroom Use of Electronic Devices > Policy, 4.00",
+     "9.3 Classroom Use of Electronic Devices > Related Policies, Procedures and Documents",
+     "9.1 Use of Information Technology > 4.00 Policy > 4.01 General Rules, 4.01.01–4.01.02",
+     "9.4 Information Security Policy Statement > 4.00 Policy, 4.03.04–4.03.05",
+     "Examinations > Examination Regulations for Candidates"
+    ],
+    "ms": 30
+   },
+   {
+    "id": "P4",
+    "question": "What is included in my official student record at Laurier?",
+    "want": [
+     "10.2-student-records",
+     "10.2-appendix-a"
+    ],
+    "rank": 1,
+    "top": [
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 3.0. Procedure > 3.1. Information included in the Student Academic Record",
+     "Procedure for Granting Access to Student Personal Information by External Official Student Organizations (10.2) > 2.0 Definitions",
+     "10.2 Student Academic Record > 2.00 Definitions, 2.01–2.03",
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 2.0. Definitions",
+     "Procedure for Granting Access to Student Personal Information for Research Purposes (10.2) > 2.0 Definitions"
+    ],
+    "ms": 27
+   },
+   {
+    "id": "P5",
+    "question": "What happens to my courses if there is a strike or academic disruption?",
+    "want": [
+     "2.5-policy-on-academic-disruption"
+    ],
+    "rank": 1,
+    "top": [
+     "2.5 Policy on Academic Disruption > II. Procedures > B. Short Disruptions",
+     "2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > B. Definitions",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > One to Two Weeks",
+     "Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Re-registering for a Course After the Official Deadline"
+    ],
+    "ms": 19
+   },
+   {
+    "id": "P6",
+    "question": "How does Laurier respond to a disclosure of sexual violence?",
+    "want": [
+     "12.4-gendered-and-sexual-violence",
+     "gendered-and-sexual-violence-policy-12.4"
+    ],
+    "rank": 1,
+    "top": [
+     "12.4 Gendered and Sexual Violence > 5.00 Policy, 5.08–5.10",
+     "12.4 Gendered and Sexual Violence > 2.00 Purpose, 2.01–2.02",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > 1.0 Definitions",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > 2.0 Response Options: Disclosure, Supports, Informal Interventions, and Complaint Processes",
+     "Procedures Relating to the Prevention of Harassment, Discrimination and Sexual Misconduct (6.1) > 4.0 Complaints of Sexual Misconduct or Sexual Violence against Students"
+    ],
+    "ms": 22
+   }
+  ]
+ },
+ "keyword": {
+  "date": "2026-11-05",
+  "summary": {
+   "questions": 17,
+   "top3": 17,
+   "top5": 17,
+   "reranked": false,
+   "dense": false
+  },
+  "rows": [
+   {
+    "id": "E4",
+    "question": "What are the plagiarism rules?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2",
+     "misconduct-procedures"
+    ],
+    "rank": 2,
+    "top": [
+     "Gen AI Student Resource Hub > Gen AI and Academic Integrity > Don't Plagiarize",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Self-Plagiarism",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+     "Board of Governors By-laws > By-law No. 1 > 16. Parliamentary Rules of Procedure at Meetings of the Board and its Committees",
+     "11.14 Policy for the Responsible Conduct of Research > 2.00 Definitions, 2.04.02–2.04.06"
+    ],
+    "ms": 3
+   },
+   {
+    "id": "L1",
+    "question": "How do I request a deferred final exam?",
+    "want": [
+     "deferred-exams",
+     "exams",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Deferred Final Exams > Two Exams at the Same Time",
+     "Deferred Exams > Deferred Final Exams > Medical Grounds",
+     "Examinations > Final University Examinations",
+     "Examinations > Religious Accommodations and Final Examination Scheduling",
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Final Exam Deferral"
+    ],
+    "ms": 4
+   },
+   {
+    "id": "L2",
+    "question": "What counts as academic misconduct at Laurier?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Impersonating Another Person in a Test or Exam",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 2.00 Definitions, 2.01–2.03",
+     "6.1 Prevention of Harassment, Discrimination and Sexual Misconduct > 2.00 Definitions, 2.09–2.11",
+     "6.1 Prevention of Harassment, Discrimination and Sexual Misconduct > 2.00 Definitions, 2.12.01–2.16"
+    ],
+    "ms": 7
+   },
+   {
+    "id": "L3",
+    "question": "What is the last day to drop a fall term course without failure?",
+    "want": [
+     "dates-fall",
+     "add-drop"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+     "Adding and Dropping Courses > Overview",
+     "Adding and Dropping Courses > Overview",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > September, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > April, 2027"
+    ],
+    "ms": 5
+   },
+   {
+    "id": "L4",
+    "question": "How do I register for academic accommodations for a disability?",
+    "want": [
+     "accessible-learning",
+     "policy-2-3"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of Students, 20.00",
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Definitions, 6.00–7.00",
+     "7.2 Animals on Campus > 4.00 Policy, 4.03.02–4.03.05",
+     "8.10 Accessible Service Policy for Persons with Disabilities > Related Policies, Procedures and Documents",
+     "Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning, 1.00–2.01"
+    ],
+    "ms": 5
+   },
+   {
+    "id": "L5",
+    "question": "Is ChatGPT an approved AI tool at Laurier?",
+    "want": [
+     "gen-ai"
+    ],
+    "rank": 1,
+    "top": [
+     "Gen AI Student Resource Hub > Which Tools Should I Use at Laurier?",
+     "Academic Petitions and Appeals > Academic Petition Process > Generative AI Tools & Petition Submissions",
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds > Generative AI Tools & Deferred Examination Petition Submissions",
+     "Gen AI Student Resource Hub > Gen AI and Academic Integrity > Don't Plagiarize",
+     "9.6 Use, Procurement, and Development of Generative Artificial Intelligence > 3.00 Jurisdiction/Scope, 3.01"
+    ],
+    "ms": 6
+   },
+   {
+    "id": "L6",
+    "question": "I was sick for a few days and missed classes. What does Laurier say I should do?",
+    "want": [
+     "disruptions",
+     "student-regulations"
+    ],
+    "rank": 1,
+    "top": [
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+     "Academic Petitions and Appeals > Academic Petition Process > Documentation > Medical Documentation Expectations",
+     "Deferred Exams > Deferred Final Exams > Medical Grounds",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
+     "Student Regulations > Medical Excuse Slips"
+    ],
+    "ms": 7
+   },
+   {
+    "id": "L7",
+    "question": "How do I appeal my final grade?",
+    "want": [
+     "grades",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Grade Appeal Request",
+     "Grades > Final Grade Appeals",
+     "Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > This is a simplified version of the procedure. Consult the Undergraduate Academic Calendar for the full procedure.",
+     "Grades > Final Grade Appeals",
+     "Examinations > Deferred Examination Policy"
+    ],
+    "ms": 2
+   },
+   {
+    "id": "L8",
+    "question": "When is reading week in the fall 2026 term?",
+    "want": [
+     "dates-fall"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > October, 2026",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > April, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > July, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > June, 2026",
+     "Adding and Dropping Courses > Overview"
+    ],
+    "ms": 3
+   },
+   {
+    "id": "L9",
+    "question": "What happens if I have three final exams within 24 hours?",
+    "want": [
+     "exams",
+     "deferred-exams"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Faculty-Specific Forms and Information > Lazaridis School of Business and Economics > Three Exams Within 24 Hours",
+     "Deferred Exams > Deferred Final Exams > Three Exams Within 24 Hours",
+     "Examinations > Final University Examinations",
+     "Examinations > Final University Examinations",
+     "4.5 Building Hours and Access Policy > 4.0 Policy, 4.01–4.05"
+    ],
+    "ms": 4
+   },
+   {
+    "id": "L10",
+    "question": "What is the penalty for a first academic misconduct offence at Laurier?",
+    "want": [
+     "policy-12-2",
+     "misconduct-procedures",
+     "/procedures-for-student-code-of-conduct.html"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A First Offence",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A Second Offence",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 6.0 Subsequent (Second or Greater) Offence of Academic Misconduct: Application of Penalty, 6.10",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 5.0 First Offence of Academic Misconduct: Application of Penalty",
+     "Academic Misconduct Procedures > Overview"
+    ],
+    "ms": 5
+   },
+   {
+    "id": "P1",
+    "question": "What does Laurier's Non-Academic Student Code of Conduct cover?",
+    "want": [
+     "12.3-non-academic"
+    ],
+    "rank": 2,
+    "top": [
+     "Procedures for Non-Academic Student Code of Conduct > Overview",
+     "12.3 Non-Academic Student Code of Conduct > 2.00 Purpose, 2.01–2.02",
+     "12.3 Non-Academic Student Code of Conduct > Overview",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Related Policies, Procedures and Documents",
+     "Procedures for Non-Academic Student Code of Conduct > 8.0. Student Conduct Process"
+    ],
+    "ms": 8
+   },
+   {
+    "id": "P2",
+    "question": "What is Laurier's student mental health policy for?",
+    "want": [
+     "12.5-student-mental-health"
+    ],
+    "rank": 1,
+    "top": [
+     "12.5 Student Mental Health Policy > Related Policies, Procedures and Documents, 8.10",
+     "12.5 Student Mental Health Policy > Relevant Legislation",
+     "Procedures for Student Mental Health Policy (12.5) > Overview",
+     "Procedures for Student Mental Health Policy (12.5) > 1.0 Reporting",
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Relevant Legislation"
+    ],
+    "ms": 12
+   },
+   {
+    "id": "P3",
+    "question": "Can instructors restrict electronic devices in class under Laurier policy?",
+    "want": [
+     "9.3-classroom-use-of-electronic-devices"
+    ],
+    "rank": 1,
+    "top": [
+     "9.3 Classroom Use of Electronic Devices > Policy > Obligations of Instructor",
+     "9.3 Classroom Use of Electronic Devices > Policy, 4.00",
+     "4.5 Building Hours and Access Policy > 2.00 Definitions, 2.01–2.06",
+     "4.5 Building Hours and Access Policy > 2.00 Definitions, 2.07–2.10",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 4.0 In the Event the University or Individual Campus or Location Closes > 4.1 All in-person classes on the closed campus(es) or location(s) are cancelled."
+    ],
+    "ms": 10
+   },
+   {
+    "id": "P4",
+    "question": "What is included in my official student record at Laurier?",
+    "want": [
+     "10.2-student-records",
+     "10.2-appendix-a"
+    ],
+    "rank": 1,
+    "top": [
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 1.0. Purpose",
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > Overview",
+     "10.2 Student Academic Record > 2.00 Definitions, 2.01–2.03",
+     "Procedure for Granting Access to Student Personal Information by External Official Student Organizations (10.2) > 2.0 Definitions",
+     "10.2 Student Academic Record > Related Policies, Procedures and Documents"
+    ],
+    "ms": 7
+   },
+   {
+    "id": "P5",
+    "question": "What happens to my courses if there is a strike or academic disruption?",
+    "want": [
+     "2.5-policy-on-academic-disruption"
+    ],
+    "rank": 1,
+    "top": [
+     "2.5 Policy on Academic Disruption > II. Procedures > B. Short Disruptions",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+     "2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > B. Definitions",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
+     "9.3 Classroom Use of Electronic Devices > Definitions, 2.00"
+    ],
+    "ms": 5
+   },
+   {
+    "id": "P6",
+    "question": "How does Laurier respond to a disclosure of sexual violence?",
+    "want": [
+     "12.4-gendered-and-sexual-violence",
+     "gendered-and-sexual-violence-policy-12.4"
+    ],
+    "rank": 1,
+    "top": [
+     "12.4 Gendered and Sexual Violence > 5.00 Policy, 5.08–5.10",
+     "12.4 Gendered and Sexual Violence > 3.00 Definitions, 3.06–3.09",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > 1.0 Definitions",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > 2.0 Response Options: Disclosure, Supports, Informal Interventions, and Complaint Processes",
+     "Procedures Relating to the Prevention of Harassment, Discrimination and Sexual Misconduct (6.1) > 4.0 Complaints of Sexual Misconduct or Sexual Violence against Students"
+    ],
+    "ms": 2
+   }
+  ]
+ },
+ "hybrid+rerank": {
+  "date": "2026-11-05",
+  "summary": {
+   "questions": 17,
+   "top3": 17,
+   "top5": 17,
+   "reranked": true,
+   "dense": true
+  },
+  "rows": [
+   {
+    "id": "E4",
+    "question": "What are the plagiarism rules?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2",
+     "misconduct-procedures"
+    ],
+    "rank": 2,
+    "top": [
+     "11.14 Policy for the Responsible Conduct of Research > 2.00 Definitions, 2.04.02–2.04.06",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 4.01 Academic Misconduct, 4.02–4.02.02",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Self-Plagiarism",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A. Misappropriation of Another’s Work"
+    ],
+    "ms": 5028
+   },
+   {
+    "id": "L1",
+    "question": "How do I request a deferred final exam?",
+    "want": [
+     "deferred-exams",
+     "exams",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds",
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds > Employment-Related Conflict",
+     "Examinations > Religious Accommodations and Final Examination Scheduling",
+     "Examinations > Final University Examinations",
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Final Exam Deferral"
+    ],
+    "ms": 3913
+   },
+   {
+    "id": "L2",
+    "question": "What counts as academic misconduct at Laurier?",
+    "want": [
+     "misconduct-defined",
+     "policy-12-2"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 1.00 Purpose, 1.01–1.02",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 4.04 Penalties for Academic Misconduct, 4.04.02–4.04.03",
+     "Academic Misconduct Defined > Academic Misconduct",
+     "Academic Misconduct Defined > Types of Academic Misconduct > Distribution of Faculty Intellectual Property",
+     "Procedures for Student Code of Conduct: Academic Misconduct > Procedures for Investigation and Adjudication in Cases of Academic Misconduct"
+    ],
+    "ms": 4876
+   },
+   {
+    "id": "L3",
+    "question": "What is the last day to drop a fall term course without failure?",
+    "want": [
+     "dates-fall",
+     "add-drop"
+    ],
+    "rank": 1,
+    "top": [
+     "Adding and Dropping Courses > Overview",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > April, 2027",
+     "Adding and Dropping Courses > Overview",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > November, 2026"
+    ],
+    "ms": 4775
+   },
+   {
+    "id": "L4",
+    "question": "How do I register for academic accommodations for a disability?",
+    "want": [
+     "accessible-learning",
+     "policy-2-3"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of Students, 20.00",
+     "Policy 2.3 Academic Accommodation of Students with Disabilities > Definitions, 6.00–7.00",
+     "Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning, 1.00–2.01",
+     "Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning, 2.07–2.08",
+     "Examinations > Students with Disabilities: Examinations and Tests"
+    ],
+    "ms": 3810
+   },
+   {
+    "id": "L5",
+    "question": "Is ChatGPT an approved AI tool at Laurier?",
+    "want": [
+     "gen-ai"
+    ],
+    "rank": 1,
+    "top": [
+     "Gen AI Student Resource Hub > Which Tools Should I Use at Laurier?",
+     "Gen AI Student Resource Hub > Overview",
+     "Academic Petitions and Appeals > Academic Petition Process > Generative AI Tools & Petition Submissions",
+     "Deferred Exams > Deferred Final Exams > Petitions on Other Grounds > Generative AI Tools & Deferred Examination Petition Submissions",
+     "9.6 Use, Procurement, and Development of Generative Artificial Intelligence > 4.00 Policy > 4.03 Procurement, Acquisition, and/or Development of GenAI Technology, 4.03.01"
+    ],
+    "ms": 3983
+   },
+   {
+    "id": "L6",
+    "question": "I was sick for a few days and missed classes. What does Laurier say I should do?",
+    "want": [
+     "disruptions",
+     "student-regulations"
+    ],
+    "rank": 2,
+    "top": [
+     "Academic Petitions and Appeals > Academic Petition Process > Documentation > Medical Documentation Expectations",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+     "Academic Petitions and Appeals > Forms and Faculty-Specific Information > Faculty of Arts",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 5.0 When the University or individual campus or location stays open in severe weather",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 6.0 Cancellation of classes and/or examinations without closure of the University or individual campus or location"
+    ],
+    "ms": 5234
+   },
+   {
+    "id": "L7",
+    "question": "How do I appeal my final grade?",
+    "want": [
+     "grades",
+     "petitions-appeals"
+    ],
+    "rank": 1,
+    "top": [
+     "Grades > Final Grade Appeals",
+     "Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > This is a simplified version of the procedure. Consult the Undergraduate Academic Calendar for the full procedure.",
+     "Grades > Final Grade Appeals",
+     "Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > Step 2: Chair",
+     "Examinations > Deferred Examination Policy"
+    ],
+    "ms": 5137
+   },
+   {
+    "id": "L8",
+    "question": "When is reading week in the fall 2026 term?",
+    "want": [
+     "dates-fall"
+    ],
+    "rank": 1,
+    "top": [
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > October, 2026",
+     "Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+     "Academic & Related Dates: Winter Term 2027 (12-week courses) > July, 2026",
+     "Accessible Learning > Accommodations > Deadlines",
+     "President and Vice-Chancellor Search > Search Timeline"
+    ],
+    "ms": 3996
+   },
+   {
+    "id": "L9",
+    "question": "What happens if I have three final exams within 24 hours?",
+    "want": [
+     "exams",
+     "deferred-exams"
+    ],
+    "rank": 1,
+    "top": [
+     "Deferred Exams > Faculty-Specific Forms and Information > Lazaridis School of Business and Economics > Three Exams Within 24 Hours",
+     "Examinations > Final University Examinations",
+     "Deferred Exams > Deferred Final Exams > Three Exams Within 24 Hours",
+     "Examinations > Final University Examinations",
+     "Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 4.0 In the Event the University or Individual Campus or Location Closes > 4.3 Final Examinations & Assessments"
+    ],
+    "ms": 4572
+   },
+   {
+    "id": "L10",
+    "question": "What is the penalty for a first academic misconduct offence at Laurier?",
+    "want": [
+     "policy-12-2",
+     "misconduct-procedures",
+     "/procedures-for-student-code-of-conduct.html"
+    ],
+    "rank": 1,
+    "top": [
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 4.04 Penalties for Academic Misconduct, 4.04.02–4.04.03",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 6.0 Subsequent (Second or Greater) Offence of Academic Misconduct: Application of Penalty",
+     "Procedures for Student Code of Conduct: Academic Misconduct > 5.0 First Offence of Academic Misconduct: Application of Penalty",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A. Misappropriation of Another’s Work",
+     "Procedures Related to Policy 11.14 Responsible Conduct of Research > 2.0 Procedures > 2.4 Outcome of the Formal Investigation"
+    ],
+    "ms": 5257
+   },
+   {
+    "id": "P1",
+    "question": "What does Laurier's Non-Academic Student Code of Conduct cover?",
+    "want": [
+     "12.3-non-academic"
+    ],
+    "rank": 1,
+    "top": [
+     "12.3 Non-Academic Student Code of Conduct > 1.00 Preamble, 1.01–1.02",
+     "12.3 Non-Academic Student Code of Conduct > 2.00 Purpose, 2.01–2.02",
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 3.0. Procedure > 3.1. Information included in the Student Academic Record",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > 1.00 Purpose, 1.01–1.02",
+     "Policy 12.2 Student Code of Conduct: Academic Misconduct > Related Policies, Procedures and Documents"
+    ],
+    "ms": 4821
+   },
+   {
+    "id": "P2",
+    "question": "What is Laurier's student mental health policy for?",
+    "want": [
+     "12.5-student-mental-health"
+    ],
+    "rank": 1,
+    "top": [
+     "12.5 Student Mental Health Policy > 1.00 Purpose, 1.01–1.02",
+     "12.5 Student Mental Health Policy > 2.00 Definitions, 2.01–2.06",
+     "Procedures for Student Mental Health Policy (12.5) > 3.0 Receipt of a Report",
+     "7.8 Smoke Free Policy > 1.00 Purpose, 1.01",
+     "Procedures for Student Mental Health Policy (12.5) > Overview"
+    ],
+    "ms": 3841
+   },
+   {
+    "id": "P3",
+    "question": "Can instructors restrict electronic devices in class under Laurier policy?",
+    "want": [
+     "9.3-classroom-use-of-electronic-devices"
+    ],
+    "rank": 1,
+    "top": [
+     "9.3 Classroom Use of Electronic Devices > Purpose, 1.00",
+     "9.3 Classroom Use of Electronic Devices > Jurisdiction/Scope, 3.00",
+     "9.1 Use of Information Technology > 4.00 Policy > 4.01 General Rules, 4.01.01–4.01.02",
+     "Examinations > Examination Regulations for Candidates",
+     "4.5 Building Hours and Access Policy > 2.00 Definitions, 2.07–2.10"
+    ],
+    "ms": 4426
+   },
+   {
+    "id": "P4",
+    "question": "What is included in my official student record at Laurier?",
+    "want": [
+     "10.2-student-records",
+     "10.2-appendix-a"
+    ],
+    "rank": 2,
+    "top": [
+     "Procedure for Granting Access to Student Personal Information by External Official Student Organizations (10.2) > 2.0 Definitions",
+     "10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 3.0. Procedure > 3.1. Information included in the Student Academic Record",
+     "10.4 Information Governance > 2.00 Definitions, 2.15–2.23",
+     "10.2 Student Academic Record > 4.00 Policy > 4.05 Third Party Access to the Student Academic Record",
+     "10.4 Information Governance > 4.00 Policy > 4.02 Records Management, 4.02.01"
+    ],
+    "ms": 4597
+   },
+   {
+    "id": "P5",
+    "question": "What happens to my courses if there is a strike or academic disruption?",
+    "want": [
+     "2.5-policy-on-academic-disruption"
+    ],
+    "rank": 1,
+    "top": [
+     "2.5 Policy on Academic Disruption > II. Procedures > B. Short Disruptions",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
+     "2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > B. Definitions",
+     "Managing Unexpected Academic Disruptions > Types of Short-Term Absences > One to Two Weeks",
+     "Examinations > Virtual Campus Courses: In-Person Midterms, In-Person Assessments, and In-Person Final Examinations Policy"
+    ],
+    "ms": 4587
+   },
+   {
+    "id": "P6",
+    "question": "How does Laurier respond to a disclosure of sexual violence?",
+    "want": [
+     "12.4-gendered-and-sexual-violence",
+     "gendered-and-sexual-violence-policy-12.4"
+    ],
+    "rank": 1,
+    "top": [
+     "12.4 Gendered and Sexual Violence > 2.00 Purpose, 2.01–2.02",
+     "12.4 Gendered and Sexual Violence > 5.00 Policy, 5.08–5.10",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > 3.0 Supports and Services > 3.3 Individuals who are Witnesses or Supporting Impacted Individuals",
+     "Procedures Relating to the Gendered and Sexual Violence Policy (12.4) > Appendix A: Limits to Confidentiality",
+     "Procedures Relating to the Prevention of Harassment, Discrimination and Sexual Misconduct (6.1) > 4.0 Complaints of Sexual Misconduct or Sexual Violence against Students"
+    ],
+    "ms": 4616
+   }
+  ]
+ }
+}

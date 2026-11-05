@@ -1,0 +1,84 @@
+name: Update policy index
+
+# Weekly re-check of every Laurier policy page. Only sections whose text changed are re-embedded;
+# sections and pages that disappeared are deleted. See policy_index/README.md.
+#
+# With the Cloudflare secrets below set, the job updates D1 + Vectorize for the deployed Worker.
+# Without them, it keeps a SQLite index in the Actions cache (so runs stay incremental) and uploads
+# it as an artifact for a self-hosted server.
+on:
+  schedule:
+    - cron: "23 6 * * 1" # Mondays 06:23 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report what changed without writing anything
+        type: boolean
+        default: false
+      force:
+        description: Allow deleting more than 20% of pages in one run
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-index
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.POLICY_INDEX_API_TOKEN }} # D1 Edit + Vectorize Edit
+      D1_DATABASE_ID: ${{ vars.D1_DATABASE_ID }}
+      VECTORIZE_INDEX: ${{ vars.VECTORIZE_INDEX || 'wlu-policies' }}
+      MODEL_CACHE_DIR: ${{ github.workspace }}/.model-cache
+      FLAGS: ${{ inputs.dry_run && '--dry-run' || '' }} ${{ inputs.force && '--force' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: policy_index/package-lock.json
+      - run: npm ci --omit=dev
+        working-directory: policy_index
+      - uses: actions/cache@v4
+        with:
+          path: .model-cache
+          key: hf-Xenova-bge-small-en-v1.5-fp32
+      - name: Restore the previous SQLite index
+        if: env.D1_DATABASE_ID == ''
+        uses: actions/cache/restore@v4
+        with:
+          path: policy_index/data/policies.sqlite
+          key: policy-db-${{ github.run_id }}
+          restore-keys: policy-db-
+      - name: Sync
+        working-directory: policy_index
+        run: |
+          if [ -n "$D1_DATABASE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            node src/cli.mjs sync --store cloudflare --report data/report.json $FLAGS
+          else
+            echo "::notice::No Cloudflare settings: updating a SQLite index instead"
+            node src/cli.mjs sync --report data/report.json $FLAGS
+          fi
+      - name: Save the SQLite index
+        if: env.D1_DATABASE_ID == '' && !inputs.dry_run
+        uses: actions/cache/save@v4
+        with:
+          path: policy_index/data/policies.sqlite
+          key: policy-db-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: policy-index
+          path: |
+            policy_index/data/report.json
+            policy_index/data/policies.sqlite
+          if-no-files-found: ignore
+          retention-days: 30

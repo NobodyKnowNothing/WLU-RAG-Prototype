@@ -1,0 +1,20 @@
+{
+  "name": "wlu-policy-index",
+  "private": true,
+  "type": "module",
+  "description": "Section-level vector index of every Laurier policy page, with weekly change detection and a search tool for agents",
+  "engines": { "node": ">=22.13" },
+  "bin": { "policy-index": "src/cli.mjs" },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "sync": "node src/cli.mjs sync",
+    "serve": "node src/cli.mjs serve",
+    "eval": "node src/cli.mjs eval"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.2"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2"
+  }
+}
