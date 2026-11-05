@@ -31,7 +31,7 @@
   {"id": "L7", "group": "laurier", "question": "How do I appeal my final grade?", "laurier": ["grades", "petitions-appeals"]},
   {"id": "L8", "group": "laurier", "question": "When is reading week in the fall 2026 term?", "laurier": ["dates-fall"]},
   {"id": "L9", "group": "laurier", "question": "What happens if I have three final exams within 24 hours?", "laurier": ["exams", "deferred-exams"]},
-  {"id": "L10", "group": "laurier", "question": "What is the penalty for a first academic misconduct offence at Laurier?", "laurier": ["policy-12-2", "misconduct-procedures"]},
+  {"id": "L10", "group": "laurier", "question": "What is the penalty for a first academic misconduct offence at Laurier?", "laurier": ["policy-12-2", "misconduct-procedures", "/procedures-for-student-code-of-conduct.html"]},
   {"id": "P1", "group": "policy", "question": "What does Laurier's Non-Academic Student Code of Conduct cover?", "laurier": ["12.3-non-academic"]},
   {"id": "P2", "group": "policy", "question": "What is Laurier's student mental health policy for?", "laurier": ["12.5-student-mental-health"]},
   {"id": "P3", "group": "policy", "question": "Can instructors restrict electronic devices in class under Laurier policy?", "laurier": ["9.3-classroom-use-of-electronic-devices"]},
