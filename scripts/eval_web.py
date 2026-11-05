@@ -68,6 +68,10 @@ def score(item, r):
             claims=len(claims),
             verified_claims=sum(c["verified"] for c in claims),
         )
+        # Kept so a failed quote check can be traced to the model or to the verifier.
+        flagged = [{"text": c["text"], "quote": c["quote"], "sources": c["sources"], "issue": c.get("issue")} for c in claims if not c["verified"]]
+        if flagged:
+            out["unverified_claims"] = flagged
     return out
 
 
@@ -143,7 +147,7 @@ def main():
                 print(f"{mode:6} {item['id']:4} stopped: the Workers AI daily allowance is used up (resets 00:00 UTC)", flush=True)
                 limited = True
                 break
-            row = {"id": item["id"], "group": item["group"], "date": date.today().isoformat(), "seconds": round(time.time() - t0, 1)}
+            row = {"id": item["id"], "group": item["group"], "date": date.today().isoformat(), "url": args.url, "seconds": round(time.time() - t0, 1)}
             if "error" in r:
                 row["error"] = r["error"]
             else:
