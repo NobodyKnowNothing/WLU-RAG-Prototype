@@ -175,7 +175,10 @@ export default {
     try {
       return json(await ask(env, ctx, req));
     } catch (e) {
-      return json({ error: "Upstream model error", detail: String(e.message || e) }, 502);
+      const detail = String(e.message || e);
+      // Workers AI error 4006: the account's daily neuron allowance is used up until 00:00 UTC.
+      if (/\b4006\b|daily free allocation/.test(detail)) return json({ error: "daily_limit", detail }, 429);
+      return json({ error: "Upstream model error", detail }, 502);
     }
   },
 };

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { buildUserMessage } from "../src/answer.js";
-import { CATALOG, PAGES, authorityOf, parseSearchResults } from "../src/laurier.js";
+import { CATALOG, PAGES, authorityOf, parseSearchResults, publisherOf } from "../src/laurier.js";
 
 test("site search results are parsed from the endpoint's HTML", () => {
   const html = `<li class="search-result">
@@ -16,6 +16,13 @@ test("site search results are parsed from the endpoint's HTML", () => {
     { title: "Withdrawal & Refund Form", url: "https://students.wlu.ca/common/forms/withdrawal.pdf", snippet: "" },
   ]);
   assert.deepEqual(parseSearchResults(""), []);
+});
+
+test("pages found by site search are named after their site area", () => {
+  const found = { id: "search:https://students.wlu.ca/x.html", url: "https://students.wlu.ca/x.html", publisher: "students.wlu.ca" };
+  assert.equal(publisherOf(found, { area: "Accessible Learning" }), "Laurier Students: Accessible Learning");
+  assert.equal(publisherOf(found, { area: "" }), "students.wlu.ca");
+  assert.equal(publisherOf(PAGES[0], { area: "Something" }), PAGES[0].publisher);
 });
 
 test("sources are ranked by authority: policies and the calendar are rules, the rest is guidance", () => {

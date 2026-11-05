@@ -1,7 +1,9 @@
 // Lexical and vector ranking helpers shared by the course-document and Laurier-page searches.
 
+// "Laurier" is on every university page, so in a question it only favours sections that happen to
+// say it (a policy's "Purpose", the lab manual's parking-space example).
 const STOPWORDS = new Set(
-  "a an and are as at be by can do does for from has have how i if in is it its me my of on or our so that the their them then there these this to was we what when where which who why will with you your".split(" ")
+  "a an and are as at be by can do does for from has have how i if in is it its me my of on or our so that the their them then there these this to was we what when where which who why will with you your laurier wlu wilfrid".split(" ")
 );
 
 // Light suffix stripping so "missed"/"missing" match "miss" and "labs" matches "lab".
@@ -28,6 +30,7 @@ const SYNONYMS = [
   [/\b(cheat|cheating|copy|copied|copying)\b/i, "plagiarism, academic misconduct"],
   [/\b(hand in|turn in|upload|submit|submission)\b/i, "submit, Dropbox, MyLearningSpace"],
   [/\blate\b/i, "late submission deduction"],
+  [/\b(counts? as|considered|means?|meaning|defined?|definitions?)\b/i, "definitions, defined, includes"],
   [/\b(marks?|marking|graded)\b/i, "grade, grading"],
   [/\b(prof|professor|teacher|ta|contact)\b/i, "instructor, IA, email"],
 ];

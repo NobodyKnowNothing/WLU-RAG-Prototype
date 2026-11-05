@@ -10,6 +10,7 @@ of the same kind), and docs/eval.json is rebuilt from all stored runs for the si
 """
 import argparse
 import json
+import re
 import statistics
 import time
 import urllib.error
@@ -122,6 +123,7 @@ def main():
     ap.add_argument("--modes", default="simple,full")
     ap.add_argument("--ids", help="comma-separated question ids (default: all)")
     ap.add_argument("--retrieve-only", action="store_true")
+    ap.add_argument("--merge", action="store_true", help="keep the stored rows for questions not re-run")
     args = ap.parse_args()
 
     items = json.loads((root / "data" / "web_eval.json").read_text(encoding="utf-8"))
@@ -129,12 +131,19 @@ def main():
     stored = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.exists() else {}
     runs = stored.get("runs", {})
     kind = "retrieval" if args.retrieve_only else "answers"
+    order = [i["id"] for i in items]
+    limited = False
     for mode in args.modes.split(","):
         rows = []
         for item in chosen:
             t0 = time.time()
             r = ask(args.url, item, mode, args.retrieve_only)
-            row = {"id": item["id"], "group": item["group"], "seconds": round(time.time() - t0, 1)}
+            if "error" in r and re.search(r"4006|daily_limit|daily free allocation", r["error"]):
+                # Every further answer would fail the same way until 00:00 UTC; stop and keep what ran.
+                print(f"{mode:6} {item['id']:4} stopped: the Workers AI daily allowance is used up (resets 00:00 UTC)", flush=True)
+                limited = True
+                break
+            row = {"id": item["id"], "group": item["group"], "date": date.today().isoformat(), "seconds": round(time.time() - t0, 1)}
             if "error" in r:
                 row["error"] = r["error"]
             else:
@@ -145,7 +154,14 @@ def main():
             rows.append(row)
             flags = " ".join(f"{k}={v}" for k, v in row.items() if k in ("pc141_retrieved", "laurier_retrieved", "pc141_cited", "laurier_cited", "refused", "status", "error") and v is not None)
             print(f"{mode:6} {item['id']:4} {row['seconds']:5.1f}s {flags}", flush=True)
-        runs[f"{mode}:{kind}"] = {"mode": mode, "kind": kind, "date": date.today().isoformat(), "url": args.url, "rows": rows}
+        key = f"{mode}:{kind}"
+        if rows:
+            if args.merge and key in runs:
+                done = {r["id"] for r in rows}
+                rows = sorted([r for r in runs[key]["rows"] if r["id"] not in done] + rows, key=lambda r: order.index(r["id"]))
+            runs[key] = {"mode": mode, "kind": kind, "date": date.today().isoformat(), "url": args.url, "rows": rows}
+        if limited:
+            break
 
     RESULTS.parent.mkdir(exist_ok=True)
     RESULTS.write_text(json.dumps({"runs": runs}, indent=1, ensure_ascii=False), encoding="utf-8")

@@ -6,7 +6,7 @@
 //   2. Every university policy and procedure, from worker/src/policies.json (built from the
 //      wlu.ca sitemap by scripts/build_policy_index.mjs).
 //   3. Laurier's own site search, for any other public page on wlu.ca.
-import { decodeEntities, htmlToSections } from "./html.js";
+import { decodeEntities, htmlToSections, pageArea } from "./html.js";
 import policies from "./policies.json" with { type: "json" };
 import { BM25, tokenize } from "./retrieval.js";
 
@@ -132,7 +132,7 @@ export const PAGES = [
 ];
 
 const TTL_S = 6 * 3600;
-const PARSER_VERSION = 2; // bump when html.js changes so cached pages are parsed again
+const PARSER_VERSION = 3; // bump when html.js changes so cached pages are parsed again
 const USER_AGENT = "PC141-Course-Assistant/1.0 (+https://nobodyknownothing.github.io/WLU-RAG-Prototype/)";
 const memory = new Map(); // url -> parsed page, per Worker instance
 
@@ -146,9 +146,10 @@ export async function loadPage(entry, ctx) {
     const res = await fetch(entry.url, { headers: { "User-Agent": USER_AGENT, Accept: "text/html" }, cf: { cacheTtl: TTL_S } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     if (/\/404\//.test(res.url)) throw new Error("page has moved (redirected to 404)");
-    const sections = htmlToSections(await res.text());
+    const html = await res.text();
+    const sections = htmlToSections(html);
     if (!sections.length) throw new Error("no readable content");
-    page = { url: entry.url, fetchedAt: new Date().toISOString(), sections };
+    page = { url: entry.url, fetchedAt: new Date().toISOString(), area: pageArea(html), sections };
     if (cache) {
       const body = new Response(JSON.stringify(page), { headers: { "Content-Type": "application/json", "Cache-Control": `max-age=${TTL_S}` } });
       ctx.waitUntil(cache.put(key, body).catch(() => {}));
@@ -210,6 +211,13 @@ const SECTION_MIN_RERANK = 0.01;
 const RERANK_POOL = 40;
 const PER_PAGE_POOL = 6;
 
+// Pages found by site search are named after the site area their own <title> gives ("Laurier
+// Students: Accessible Learning"), so the model can tell a page for one group of students from one
+// for everyone.
+const SITE_NAMES = { "students.wlu.ca": "Laurier Students", "www.wlu.ca": "Laurier", "wlu.ca": "Laurier" };
+export const publisherOf = (entry, page) =>
+  entry.id.startsWith("search:") && page?.area ? `${SITE_NAMES[new URL(entry.url).hostname] || "Laurier"}: ${page.area}` : entry.publisher;
+
 const deepLink = (url, s) => (s.anchor ? `${url}#${s.anchor}` : s.heading ? `${url}#:~:text=${encodeURIComponent(s.heading)}` : url);
 
 // ---- Laurier site search -------------------------------------------------------------------
@@ -267,7 +275,7 @@ export async function searchLaurier(query, { question = query, mode, k, ctx, rer
   const pages = loaded.map(({ entry, page, error, viaSearch }) => ({
     id: entry.id,
     title: entry.title,
-    publisher: entry.publisher,
+    publisher: publisherOf(entry, page),
     url: entry.url,
     authority: entry.authority,
     ...(viaSearch && { viaSearch }),
@@ -280,7 +288,7 @@ export async function searchLaurier(query, { question = query, mode, k, ctx, rer
       kind: "laurier",
       pageId: entry.id,
       title: entry.title,
-      publisher: entry.publisher,
+      publisher: publisherOf(entry, page),
       authority: entry.authority,
       ...(entry.revised && { revised: entry.revised }),
       ...(viaSearch && { viaSearch }),
