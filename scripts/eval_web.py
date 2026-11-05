@@ -143,8 +143,8 @@ def main():
             t0 = time.time()
             r = ask(args.url, item, mode, args.retrieve_only)
             if "error" in r and re.search(r"4006|daily_limit|daily free allocation", r["error"]):
-                # Every further answer would fail the same way until 00:00 UTC; stop and keep what ran.
-                print(f"{mode:6} {item['id']:4} stopped: the Workers AI daily allowance is used up (resets 00:00 UTC)", flush=True)
+                # Every further answer would fail the same way until the allowance comes back; stop and keep what ran.
+                print(f"{mode:6} {item['id']:4} stopped: the Workers AI daily allowance is used up", flush=True)
                 limited = True
                 break
             row = {"id": item["id"], "group": item["group"], "date": date.today().isoformat(), "url": args.url, "seconds": round(time.time() - t0, 1)}

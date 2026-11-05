@@ -253,13 +253,12 @@
     );
   }
 
-  // The Worker runs on Cloudflare's free Workers AI allowance, which resets at 00:00 UTC.
+  // The Worker runs on Cloudflare's free Workers AI allowance. Cloudflare documents a reset at
+  // 00:00 UTC, but it has come back hours earlier, so the page doesn't promise a time.
   function showDailyLimit() {
-    const now = new Date();
-    const reset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
     out.replaceChildren(el("div", { className: "status not_found" }, el("span", { className: "icon", textContent: "⏸" }),
       el("div", {}, el("strong", { textContent: "The assistant has reached today's usage limit" }),
-        el("p", { textContent: `It runs on a free daily AI allowance, which resets at ${reset.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })} (00:00 UTC). Please try again then.` }))));
+        el("p", { textContent: "It runs on a free daily AI allowance, which has been used up for now. Please try again in a few hours." }))));
   }
 
   $("f").addEventListener("submit", async (ev) => {

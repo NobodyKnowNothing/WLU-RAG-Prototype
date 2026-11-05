@@ -60,7 +60,7 @@ const NUMBER_WORDS = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six:
 const normalize = (s) =>
   s
     .toLowerCase()
-    .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred)\b/g, (w) => NUMBER_WORDS[w])
+    .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred)\b(?!['’])/g, (w) => NUMBER_WORDS[w]) // not "one's own"
     .replace(/(\d),(\d{3})\b/g, "$1$2");
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 

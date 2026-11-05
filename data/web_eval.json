@@ -41,10 +41,10 @@
   {"id": "S1", "group": "search", "question": "How do I order an official transcript?", "laurier": ["/student-records/"]},
   {"id": "S2", "group": "search", "question": "How do I get a parking permit on the Waterloo campus?", "laurier": ["/parking"]},
   {"id": "S3", "group": "search", "question": "How do I get my OneCard student ID?", "laurier": ["/onecard/"]},
+  {"id": "S4", "group": "search", "question": "Who is the dean of the Faculty of Science?", "laurier": ["/faculty-of-science/faculty-and-staff", "richelle-monaghan-dean-of-science"]},
   {"id": "U1", "group": "unanswerable", "question": "What is the weighting of the PC141 final exam?"},
   {"id": "U2", "group": "unanswerable", "question": "Which edition of the textbook is required for PC141?"},
   {"id": "U3", "group": "unanswerable", "question": "What is the Wi-Fi password for the physics lab?"},
   {"id": "U4", "group": "unanswerable", "question": "How many lab reports can I drop in PC141?"},
-  {"id": "U5", "group": "unanswerable", "question": "Is the PC141 midterm open book?"},
-  {"id": "U6", "group": "unanswerable", "question": "Who is the dean of the Faculty of Science?"}
+  {"id": "U5", "group": "unanswerable", "question": "Is the PC141 midterm open book?"}
 ]
