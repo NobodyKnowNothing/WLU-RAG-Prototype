@@ -253,6 +253,14 @@
     );
   }
 
+  // The Worker runs on Cloudflare's free Workers AI allowance. Cloudflare documents a reset at
+  // 00:00 UTC, but it has come back hours earlier, so the page doesn't promise a time.
+  function showDailyLimit() {
+    out.replaceChildren(el("div", { className: "status not_found" }, el("span", { className: "icon", textContent: "⏸" }),
+      el("div", {}, el("strong", { textContent: "The assistant has reached today's usage limit" }),
+        el("p", { textContent: "It runs on a free daily AI allowance, which has been used up for now. Please try again in a few hours." }))));
+  }
+
   $("f").addEventListener("submit", async (ev) => {
     ev.preventDefault();
     go.disabled = true;
@@ -266,6 +274,7 @@
         body: JSON.stringify({ question: q.value, scope, mode: getMode(), sections: { lab: $("lab").value, tutorial: $("tut").value } }),
       });
       const data = await res.json();
+      if (res.status === 429 || /\b4006\b|daily free allocation/.test(data.detail || "")) return showDailyLimit();
       if (!res.ok) throw new Error(data.detail || data.error || res.statusText);
       render(data);
     } catch (err) {

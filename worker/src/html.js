@@ -39,6 +39,14 @@ export function pageTitle(html) {
   return t ? stripTags(t[1]).split(" | ")[0] : "";
 }
 
+// The part of the site a page belongs to, from its <title>:
+// "Exam Booking Procedures | Accessible Learning | Students - Wilfrid Laurier University" -> "Accessible Learning".
+export function pageArea(html) {
+  const t = html.match(/<title>([\s\S]*?)<\/title>/i);
+  const parts = t ? stripTags(t[1]).split(" | ") : [];
+  return parts.length > 2 ? parts.slice(1, -1).join(" > ") : "";
+}
+
 export function htmlToSections(html) {
   let s = contentRegion(html)
     .replace(/<!--[\s\S]*?-->/g, " ")
@@ -58,7 +66,7 @@ export function htmlToSections(html) {
     const text = stripTags(inner);
     return text ? `\n\u0001${level}\u0001${anchorOf(attrs, inner)}\u0001${text}\u0002\n` : " ";
   };
-  s = s
+  s = labelTabs(s)
     .replace(/<div class="heading">((?:(?!<h\d|<\/div)[\s\S])*)<\/div>/gi, (_, i) => marker(2, "", i)) // calendar section headings
     .replace(/<h([2-4])\b([^>]*)>([\s\S]*?)<\/h\1>/gi, (_, l, a, i) => marker(+l, a, i))
     .replace(/<th\b[^>]*>(\s*<a\b[^>]*name="[^"]*"[\s\S]*?)<\/th>/gi, (_, i) => marker(2, "", i)) // calendar month rows
@@ -81,18 +89,54 @@ export function htmlToSections(html) {
   };
   for (const raw of s.split("\n")) {
     const line = raw.replace(/[ \t ]+/g, " ").trim();
-    const h = line.match(/^\u0001(\d)\u0001([^\u0001]*)\u0001([^\u0002]*)\u0002$/);
+    const h = line.match(/^\u0001(\d|T|E)\u0001([^\u0001]*)\u0001([^\u0002]*)\u0002$/);
     if (h) {
       flush();
-      const level = +h[1];
-      while (stack.length && stack.at(-1).level >= level) stack.pop();
-      stack.push({ level, anchor: h[2], text: h[3] });
+      if (h[1] === "E") {
+        while (stack.length && !stack.pop().tab); // a tab panel ends: drop it and its headings
+        continue;
+      }
+      // Headings inside a tab panel nest under the tab's name instead of replacing it.
+      const tab = h[1] === "T";
+      const level = tab ? 0 : +h[1];
+      while (!tab && stack.length && !stack.at(-1).tab && stack.at(-1).level >= level) stack.pop();
+      stack.push({ level, tab, anchor: h[2], text: h[3] });
     } else if (line && line !== "•" && !/^[–\s]+$/.test(line)) {
       lines.push(line);
     }
   }
   flush();
   return splitLong(datesToSentences(sections));
+}
+
+// students.wlu.ca shows campus-specific content in tabs (Waterloo, Brantford, ...), one panel at a
+// time. The tab list is dropped and each panel is wrapped in markers carrying the tab's name, so a
+// Brantford rule is cited as "Brantford > ..." and never read as a Waterloo one. Panels are found
+// by counting nested divs from the `<div id="tab-...">` the tab links point to.
+function labelTabs(s) {
+  const titles = new Map();
+  s = s.replace(/<ul\b[^>]*>((?:(?!<\/?ul\b)[\s\S])*)<\/ul>/gi, (m, inner) => {
+    const tabs = [...inner.matchAll(/href="#([\w-]+)"[^>]*>[\s\S]*?class="tab-title"[^>]*>([\s\S]*?)<\//gi)];
+    for (const [, id, title] of tabs) titles.set(id, stripTags(title));
+    return tabs.length ? " " : m;
+  });
+  if (!titles.size) return s;
+  let out = "";
+  let last = 0;
+  const open = []; // for each open div: the tab it starts, or null
+  for (const m of s.matchAll(/<(\/?)div\b([^>]*)>/gi)) {
+    if (m[1]) {
+      if (!open.pop()) continue;
+      out += `${s.slice(last, m.index)}\n\u0001E\u0001\u0001\u0002\n`;
+    } else {
+      const id = (m[2].match(/\bid="([^"]+)"/i) || [])[1];
+      open.push(titles.has(id) ? id : null);
+      if (!titles.has(id)) continue;
+      out += `${s.slice(last, m.index)}\n\u0001T\u0001${id}\u0001${titles.get(id)}\u0002\n`;
+    }
+    last = m.index;
+  }
+  return out + s.slice(last);
 }
 
 // Calendar date tables become "1 – Classes begin" rows under a "September, 2026" heading;

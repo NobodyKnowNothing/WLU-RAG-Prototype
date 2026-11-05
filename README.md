@@ -73,7 +73,7 @@ A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/p
   - Every university policy and procedure, 169 in all, listed in `worker/src/policies.json`. `scripts/build_policy_index.mjs` builds that list from the wlu.ca sitemap, which lists the whole policy register under `/about/governance/assets/resources/`. It records each policy's title, number, approval and revision dates, office and purpose, and re-reads only pages whose sitemap date changed.
   - Laurier's own site search (the endpoint behind wlu.ca's search box) for any other public page, such as transcripts, parking or the OneCard. It is not a published API, so the Worker sends one request per question and caches results; setting `SITE_SEARCH` to `"off"` in `wrangler.jsonc` turns it off. PDFs, Word files and Qualtrics forms it finds are listed as links when the question asks for a form, but not quoted.
 
-  The Worker splits pages into sections (`worker/src/html.js`) and cites the section with a link to it. Each source is marked as a *university policy* (with its last revision date), the *Academic Calendar* or a *guidance page*. When they disagree, the policy or calendar version comes first.
+  The Worker splits pages into sections (`worker/src/html.js`) and cites the section with a link to it. Campus tabs (Waterloo, Brantford, Kitchener, Milton) stay in the section name, so a Brantford rule is cited as *Brantford > …*. Pages found by site search are labelled with their part of the site (e.g. *Laurier Students: Accessible Learning*), and the model must say when a rule only covers one campus, faculty or group of students. Each source is marked as a *university policy* (with its last revision date), the *Academic Calendar* or a *guidance page*. When they disagree, the policy or calendar version comes first.
 - **Course rules and university rules are kept apart.** Answers come back as two lists, *PC141 course rules* and *Laurier university-wide*. Each statement goes in the list that matches the kind of source it cites, so a university policy is never shown as a course rule.
 - **Says so instead of guessing.** Each statement must give its sources and an exact supporting quote (`worker/src/answer.js`):
   - Statements with no valid source are removed.
@@ -89,28 +89,51 @@ The API takes `POST {"question", "mode": "simple"|"full", "scope": "both"|"pc141
 `scripts/eval_web.py` runs the questions in `data/web_eval.json` through both modes:
 - the 19 original questions and the 4 admin questions above;
 - 10 questions on the hand-picked Laurier pages;
-- 6 on other university policies (12.3, 12.5, 9.3, 10.2, 2.5, 12.4) and 3 that only the site search can reach (transcripts, parking, OneCard);
-- 6 questions the sources can't answer.
+- 6 on other university policies (12.3, 12.5, 9.3, 10.2, 2.5, 12.4), and 4 that only the site search can reach (transcripts, parking, OneCard, the Dean of Science);
+- 5 questions the sources can't answer.
 
 The results are in `results/web_eval.json` and on the site under "How it works".
 
 | Check | Simple | Full |
 |---|---|---|
 | PC141 section retrieved (top 5) | 23/23 | 23/23 |
-| Laurier page retrieved | 20/20 | 20/20 |
+| Laurier page retrieved | 21/21 | 20/20 |
 | Answer cites the right PC141 section | 4/4 | 23/23 |
-| Answer cites the right Laurier page | 6/7 | 11/11 |
-| Says it can't verify (unanswerable questions) | 4/4 | 6/6 |
-| Statements whose quote checks out | 32/32 | 95/98 |
-| Median seconds per answer | 4.9 | 7.7 |
+| Answer cites the right Laurier page | 6/7 | 19/20 |
+| Says it can't verify (unanswerable questions) | 4/4 | 5/5 |
+| Statements whose quote checks out | 32/32 | 117/119 |
+| Median seconds per answer | 4.9 | 10.3 |
+
+The Full answer rows are from 2026-11-05 on `wrangler dev`, with the fixes listed below (not yet deployed). That run used the same models and live wlu.ca pages as the deployed Worker, and covered 47 of the 48 questions. The Dean of Science question hit the Workers AI daily allowance. The Simple answer rows are from an earlier 14-question run, before the policy index and site search. The retrieval rows cover every question in Simple mode, and the PC141 and university-side questions in Full mode.
 
 With section-level chunks, keyword search alone found the right PC141 section as often as the full pipeline. (With 63 sections, "retrieve 150" already means reranking every section.) The reranker mattered on long Laurier policy pages. Simple's one miss was "What counts as academic misconduct at Laurier?", where it said it couldn't verify an answer rather than guessing. So starting simple works for the course documents; reranking is worth keeping for university pages. The site defaults to Full, and either mode can be picked per question.
 
+An earlier Full run against the deployed Worker, the same day, covered 41 questions. It got three wrong, and each has a fix:
+
+- *How do I request a deferred final exam?* cited the Accessible Learning Centre's exam-booking page, which site search found, and gave its steps (the ALC Deferred Exam Form) as if they applied to every student.
+  - Fix: pages found by site search now carry their part of the site in the source label, and the prompt asks the model to say who a rule is for.
+  - Re-run: the answer now gives the general deadlines first and says the ALC steps are for students registered with Accessible Learning.
+- *What counts as academic misconduct at Laurier?* was only partly verified. Every section of Policy 12.2 says "academic misconduct", so keyword ranking picked its Purpose section (which says "Laurier") over its definitions.
+  - Fix: "Laurier", "WLU" and "Wilfrid" are now ignored in searches, and "counts as" / "means" / "considered" also search for definitions. This also stops the lab manual's "parking spaces at Laurier" example from turning up as a PC141 source for university questions.
+  - Re-run: fully verified.
+- *How do I get a parking permit on the Waterloo campus?* said it couldn't verify an answer. The parking page puts each campus in a tab, and the parser didn't keep the tabs apart, so Brantford's text appeared under a Waterloo heading.
+  - Fix: the campus is now part of each section's name.
+  - Re-run: still "couldn't verify", which is correct. No public page found says how a student gets a Waterloo permit. The student page's Waterloo tab only says permits are required, and wlu.ca's Waterloo parking page is for visitors.
+
+Other changes after that run:
+
+- The verifier read "one's own" as the number 1 and rejected an exact quote. It no longer does.
+- The first-offence penalty question was re-scored as correct. It cites section 5.0 of the official *Procedures for Student Code of Conduct*, which the expected pages didn't list.
+- "Who is the Dean of Science?" moved from the unanswerable group to site search. Site search now finds the answer on wlu.ca.
+
+Two of the 119 statements in the Full run had quotes that didn't check out, and both were marked unverified:
+- **L6:** the model fixed a typo in the source ("occassional") while quoting it.
+- **L9:** the model claimed two deadlines conflict without giving a quote, although they cover different situations.
+
 Caveats:
 
-- The answer rows (cites the right source, refuses, quote checks) were measured before the policy index and site search were added, and Simple-mode answers only on a 14-question subset, to stay within the Workers AI daily allowance. Retrieval was re-checked afterwards: all 48 questions in Simple mode, and the 20 university-side questions plus the PC141 ones in Full mode. Spot checks of Full answers after the change (Policy 9.3 on classroom devices, ordering a transcript through site search, academic misconduct from Policy 12.2) were all verified.
-- The evaluation ran against `wrangler dev`, which uses the same models and live wlu.ca pages as the deployed Worker. Whether wlu.ca's site search answers requests from Cloudflare's servers, rather than a home connection, can only be checked after deploying; if it doesn't, those sources show as unavailable and the rest still works.
-- The Full answers were measured before small prompt changes: different rules for different situations are not a conflict, and a statement must not mix course and university sources (the verifier now flags any that do).
+- **Daily capacity.** The Workers AI free plan gives the account 10,000 neurons a day, shared by every user and by evaluation runs. Cloudflare's usage analytics count about 120 neurons per answer, nearly all of it Llama 3.3 70B. In practice, though, the allowance ran out at about 15:15 UTC on 2026-11-05 after 41 answers, when the analytics showed only about 5,100 neurons. It was back by 21:10 UTC, ran out again after 49 more answers, and on 2026-11-04 it ran out near 10,000. So neither the dashboard nor the documented 00:00 UTC reset is a reliable guide. Expect roughly 40 to 50 answers at a time across all users on the free plan. After that the Worker returns 429, and the page asks students to try again in a few hours. Workers Paid removes the cap and charges $0.011 per 1,000 neurons above the free allowance. A full 48-question answer run can use the whole allowance, so split evaluations with `--ids` and `--merge`.
+- After deploying, all 48 questions were re-run against the live Worker in Simple retrieval mode: 122 wlu.ca page loads, 53 of them found through site search, with no errors. Two answers were also checked end to end on the live site: the L04 lab time and ordering a transcript.
 - The quote check confirms the wording exists in the source. It can't catch every overstatement, so each statement shows its quote for students to compare.
 - The PC141 documents contradict each other in places. The syllabus says labs run every week, begin the week of May 4 and are in room 2089; the lab announcement says alternate weeks from September 16 in room N2089.
 - Pages behind a Laurier sign-in (Laurier Connect, MyLearningSpace) and the contents of PDF and Word forms are out of reach. Questions that need them get "Couldn't verify".
@@ -122,6 +145,7 @@ node scripts/build_policy_index.mjs              # refresh worker/src/policies.j
 cd worker && npm test                            # parser, retrieval and verification tests
 cd worker && npx wrangler dev                    # local API on :8787 (serve docs/ on :8000 to use it)
 python scripts/eval_web.py --url http://127.0.0.1:8787
+python scripts/eval_web.py --modes full --ids S3,U1 --merge   # re-run some questions against the live Worker, keep the rest
 cd worker && npx wrangler deploy                 # redeploy the API
 ```
 

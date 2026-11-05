@@ -75,6 +75,11 @@ test("a claim mixing course and university sources is flagged and filed where it
   assert.equal(v.status, "partial");
 });
 
+test("\"one's own\" is not read as the number 1", () => {
+  const v = verifyAnswer({ status: "answered", pc141: [], laurier: [{ text: "Plagiarism is presenting others' work as one's own.", quote: "the unacknowledged presentation of the work of others as one's own", sources: [3] }], unverified: "" }, SOURCES);
+  assert.ok(v.laurier[0].verified, v.laurier[0].issue);
+});
+
 test("no supported claims means not_found with an explanation", () => {
   const v = verifyAnswer({ status: "answered", pc141: [{ text: "The final is worth 40%.", quote: "final exam 40%", sources: [9] }], laurier: [], unverified: "" }, SOURCES);
   assert.equal(v.status, "not_found");

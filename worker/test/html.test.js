@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { decodeEntities, htmlToSections, pageTitle } from "../src/html.js";
+import { decodeEntities, htmlToSections, pageArea, pageTitle } from "../src/html.js";
 
 const CALENDAR = `<html><body><div class="sidebar">Navigation</div>
 <div class="content">
@@ -61,6 +61,28 @@ test("calendar date tables become dated sentences", () => {
   assert.equal(oct.text, "October 12, 2026: Thanksgiving (statutory holiday), no classes\nOct 13 - Oct 16, 2026: Fall Reading Week, no classes");
 });
 
+test("campus tab panels are named in the section path", () => {
+  const html = `<main><h2>Student Parking Permits</h2><p>Permits are required.</p>
+<div class="tabs Campus" id="tabs-0"><ul>
+  <li><a aria-labelledby="tab-0-0" href="#tab-0-0"><span class="tab-title">Waterloo</span><span class="tab-title-abbrev">WAT</span></a></li>
+  <li><a aria-labelledby="tab-0-0" href="#tab-0-1"><span class="tab-title">Brantford</span><span class="tab-title-abbrev">BRANT</span></a></li>
+</ul>
+<div id="tab-0-0"><div class="text-module"><h3>Where to Park</h3><p>Lot 15 off Bricker Ave.</p></div></div>
+<div id="tab-0-1"><div class="text-module"><p>Parking in university lots is by permit only.</p><h3>Student Parking</h3><p>Apply at parking.wlu.ca.</p></div></div>
+</div><h2>Accessible Parking</h2><p>See Accessible Parking.</p></main>`;
+  const secs = htmlToSections(html);
+  assert.deepEqual(secs.map((s) => s.path.join(" > ")), [
+    "Student Parking Permits",
+    "Student Parking Permits > Waterloo > Where to Park",
+    "Student Parking Permits > Brantford",
+    "Student Parking Permits > Brantford > Student Parking",
+    "Accessible Parking",
+  ]);
+  assert.equal(secs[2].text, "Parking in university lots is by permit only.");
+  assert.equal(secs[2].anchor, "tab-0-1");
+  assert.ok(!secs.some((s) => /WAT|BRANT/.test(s.text)));
+});
+
 test("long sections are split at line boundaries", () => {
   const para = `<p>${"word ".repeat(120)}</p>`;
   const secs = htmlToSections(`<main><h2>Long</h2>${para.repeat(6)}</main>`);
@@ -69,6 +91,11 @@ test("long sections are split at line boundaries", () => {
   const oneLine = htmlToSections(`<main><h2>Run-on</h2><p>${"word ".repeat(800)}</p></main>`);
   assert.equal(oneLine.length, 3);
   assert.ok(oneLine.every((s) => s.text.length <= 1500 && s.text.startsWith("word")));
+});
+
+test("the site area comes from the middle of the page title", () => {
+  assert.equal(pageArea("<title>Text / Exam Booking Procedures | Accessible Learning | Students - Wilfrid Laurier University</title>"), "Accessible Learning");
+  assert.equal(pageArea("<title>Deferred Exams | Students - Wilfrid Laurier University</title>"), "");
 });
 
 test("decodes named and numeric entities", () => {
