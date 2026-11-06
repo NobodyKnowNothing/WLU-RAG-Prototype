@@ -3,6 +3,11 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "ai": { "binding": "AI" },
+  // The Laurier policy index (policy_index/README.md), filled and re-checked weekly by
+  // `node policy_index/src/cli.mjs sync --store cloudflare`. Remove both bindings to go back to
+  // fetching catalog pages live. "remote": true makes `wrangler dev` use the real database and index.
+  "d1_databases": [{ "binding": "POLICY_DB", "database_name": "wlu-policies", "database_id": "22dbccee-a6be-44bf-a5f5-f43f3d758e11", "remote": true }],
+  "vectorize": [{ "binding": "POLICY_INDEX", "index_name": "wlu-policies", "remote": true }],
   "vars": {
     "ALLOWED_ORIGIN": "https://nobodyknownothing.github.io",
     // "off" stops the Worker from querying wlu.ca's site search (see src/laurier.js)

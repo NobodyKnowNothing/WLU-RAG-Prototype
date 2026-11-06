@@ -10,7 +10,7 @@
   "main": "worker.js",
   "compatibility_date": "2026-10-01",
   "ai": { "binding": "AI" },
-  "d1_databases": [{ "binding": "DB", "database_name": "wlu-policies", "database_id": "REPLACE_WITH_D1_DATABASE_ID" }],
+  "d1_databases": [{ "binding": "DB", "database_name": "wlu-policies", "database_id": "22dbccee-a6be-44bf-a5f5-f43f3d758e11" }],
   "vectorize": [{ "binding": "VECTORIZE", "index_name": "wlu-policies" }],
   "vars": {
     // Browser origins allowed to call the API (the PC141 site, local dev).

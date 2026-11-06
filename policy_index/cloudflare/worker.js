@@ -5,36 +5,13 @@
 // Per search: 1 embedding call, 1 Vectorize query, 2 D1 queries (and 1 rerank call if RERANK is
 // "on"). No page fetching or HTML parsing, so it stays inside the free plan's 50 subrequests and
 // does little CPU work of its own.
+import { cloudflareAdapter as bindingsAdapter } from "../src/cloudflare-adapter.mjs";
 import { catalog, getSection, search } from "../src/search.mjs";
-import { SQL } from "../src/schema.mjs";
 import { mcpHttp } from "../src/tool.mjs";
 
-const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5"; // must match src/embed.mjs (mean pooling, the default)
-const RERANK_MODEL = "@cf/baai/bge-reranker-base";
-
-export function cloudflareAdapter(env) {
-  const all = async (sql, ...params) => (await env.DB.prepare(sql).bind(...params).all()).results;
-  const kindsJson = (kinds) => (kinds ? JSON.stringify(kinds) : null);
-  return {
-    lexical: async (match, limit, kinds) => (await all(SQL.lexical, match, limit, kindsJson(kinds))).map((r) => ({ id: r.id, score: -r.score })),
-    embed: async (text) => (await env.AI.run(EMBED_MODEL, { text: [text] })).data[0],
-    dense: async (vector, limit, kinds) => {
-      const res = await env.VECTORIZE.query(vector, { topK: Math.min(limit, 100), ...(kinds && { filter: { kind: { $in: kinds } } }) });
-      return res.matches.map((m) => ({ id: m.id, score: m.score }));
-    },
-    // Off unless RERANK = "on": on the eval questions hybrid retrieval alone ranked the expected page
-    // first 17/17 times, and the cross-encoder 14/17 (results/policy_index_eval.json).
-    ...(env.RERANK === "on" && {
-      rerank: async (query, texts) => {
-        const res = await env.AI.run(RERANK_MODEL, { query, contexts: texts.map((text) => ({ text })), top_k: texts.length });
-        return res.response.map((r) => ({ index: r.id, score: r.score })).sort((a, b) => b.score - a.score);
-      },
-    }),
-    chunksByIds: async (ids) => (ids.length ? all(SQL.chunksByIds, JSON.stringify(ids)) : []),
-    sectionOf: (id, around) => all(SQL.sectionOf, id, around),
-    catalog: (kinds) => all(SQL.catalog, kindsJson(kinds)),
-  };
-}
+// Reranking is off unless RERANK = "on": on the eval questions hybrid retrieval alone ranked the
+// expected page first 17/17 times, and the cross-encoder 14/17 (results/policy_index_eval.json).
+export const cloudflareAdapter = (env) => bindingsAdapter({ db: env.DB, vectorize: env.VECTORIZE, ai: env.AI, rerank: env.RERANK === "on" });
 
 export default {
   async fetch(request, env) {
@@ -46,11 +23,7 @@ export default {
     if (request.method === "OPTIONS") return json(null, 204);
     const adapter = cloudflareAdapter(env);
     try {
-      if (url.pathname === "/health") {
-        const s = await env.DB.prepare(SQL.stats).first();
-        const last = await env.DB.prepare(SQL.getMeta).bind("last_sync").first();
-        return json({ ok: true, pages: s.pages, chunks: s.chunks, last_sync: last?.value ?? null });
-      }
+      if (url.pathname === "/health") return json({ ok: true, ...(await adapter.stats()) });
       if (env.API_TOKEN && request.headers.get("Authorization") !== `Bearer ${env.API_TOKEN}`) return json({ error: "unauthorized" }, 401);
       if (url.pathname === "/mcp") {
         const r = await mcpHttp(adapter, request.method, request.method === "POST" ? await request.text() : "");

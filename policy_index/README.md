@@ -79,7 +79,7 @@ claude mcp add wlu-policies -- node policy_index/src/cli.mjs mcp
 claude mcp add --transport http wlu-policies https://wlu-policy-search.<account>.workers.dev/mcp
 ```
 
-To use the index in the existing assistant instead of fetching catalog pages live, call `/search` from `searchLaurier` in `worker/src/laurier.js` (or bind the search Worker as a service binding) and map the results with `toAssistantSource`. Laurier site search can stay as it is for pages outside the index.
+The PC141 assistant Worker (`worker/`) has the index bound directly (`POLICY_DB`, `POLICY_INDEX`). It serves the same tools at `https://wlu-rag-api.nobodyknownothing.workers.dev/mcp` and `POST /policy-search`. For its answers, `searchLaurier` in `worker/src/laurier.js` takes indexed sections in place of the catalog pages it used to route to and fetch live. Laurier site search still runs alongside for pages outside the index, the existing ranking picks the final sources, and if the index fails the Worker falls back to the live path. The standalone search Worker in `cloudflare/` is only needed to serve the index without the assistant.
 
 ## Running it locally
 
@@ -180,7 +180,18 @@ Each scrolled the cited clause into the middle of the window. wlu.ca writes `4.0
 
 `wrangler deploy --dry-run` bundles the Worker (21 KiB) with all three bindings.
 
-**Not tested:** a real Cloudflare deployment (no resources were created on the account), D1 rows read per search, the Docker image (Docker isn't installed here) and the GitHub Actions run.
+**On Cloudflare (2026-11-06).** The first sync straight into D1 + Vectorize over the REST API took 464 s for 183 pages and 2,390 chunks. It's slower than the local build because each page also makes a D1 call and a Vectorize call. The assistant Worker was deployed with the index bound (version `41049787`, replacing `40b02ed9`).
+
+Live Simple-mode retrieval on all 48 eval questions matched the pre-index run:
+- PC141 section in the top 5: 23/23;
+- Laurier page retrieved: 21/21;
+- median 0.8 s.
+
+Live MCP searches took 106–152 ms.
+
+A keyword search reads about 2,950 D1 rows and loading its candidates about 120 more, so D1's free 5M rows a day allows roughly 1,600 searches. Full-mode answers had to wait, because the day's Workers AI allowance was already used up.
+
+**Not tested:** the Docker image (Docker isn't installed here) and the GitHub Actions run.
 
 ## Found along the way: Workers AI batches skew short embeddings
 

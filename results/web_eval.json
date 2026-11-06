@@ -1264,12 +1264,14 @@
    "mode": "simple",
    "kind": "retrieval",
    "date": "2026-11-05",
-   "url": "http://127.0.0.1:8787",
+   "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
    "rows": [
     {
      "id": "Q1",
      "group": "course",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1280,15 +1282,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.3 When are Order of Magnitude Calculations used?",
       "[4] PC141 Lab Manual: Estimation and Bounding > Recap",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.6 Logarithmic Scale",
-      "[6] Procedures for the Disposition of University Records > 1.0 Purpose",
-      "[7] 11.11 Establishment and Recognition of Research Collaborations other than Centres and Institutes > Purpose",
-      "[8] 2.8 Honorary Degree and Order of Wilfrid Laurier University Policy > 2.00 Definitions"
+      "[6] Merchant Card Use Procedures > Employee Compliance and Training > Definitions",
+      "[7] 8.7 Employment Accommodation Policy > 2.00 Definitions (2.04–2.05)",
+      "[8] Procedures for Honorary Degree and Order Of Wilfrid Laurier University (2.8) > 6.0 Revocation of Honorary Degrees and the Order of Wilfrid Laurier University"
      ]
     },
     {
      "id": "Q2",
      "group": "course",
-     "seconds": 0.8,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1299,15 +1303,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.7 Uncertainties",
       "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.3 Familiar Comparisons > 3.3.1 Illustration of Comparison",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.3 Familiar Comparisons",
-      "[6] 2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > A. Academic Principles",
-      "[7] 4.13 Sustainability Policy > 1.00 Purpose",
+      "[6] Wilfrid Laurier University Senate By-laws and Regulations > 1. Definitions > 1.7 Definitions of Senator at Large and Faculty-at-Large (Regulation)",
+      "[7] 11.1 Establishment, Operations and Review of Research Centres > 2.00 Definitions (2.05)",
       "[8] Laurier's Campus Accessibility Timeline: 2003-2025 > 2022-2025: Notable Accomplishments and Status Updates > Teaching Excellence and Innovation (TEI)’s Initiatives"
      ]
     },
     {
      "id": "Q3",
      "group": "course",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.2,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1318,15 +1324,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > List of Figures",
       "[4] PC141 Lab Manual: Estimation and Bounding > Recap",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Grade Review and Inquiry Policy",
-      "[6] Deferred Exams > Deferred Final Exams > Death of a Relative or Close Acquaintance",
-      "[7] Deferred Exams > Faculty-Specific Forms and Information > Faculty of Liberal Arts",
+      "[6] Procedures Supporting University Policy 13.5, Naming of University Assets > 5.0 Naming Signage > 5.3 Budgets",
+      "[7] 2.1 Cyclical Review of Undergraduate and Graduate Academic Programs > II. Institutional Quality Assurance Procedures > C. Criteria for Evaluating the Self-Study > 7. Quality Indicators",
       "[8] Master of Business Administration (MBA) > Admissions > Application Checklist"
      ]
     },
     {
      "id": "Q4",
      "group": "course",
-     "seconds": 1.0,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.1,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1337,15 +1345,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.3 Familiar Comparisons",
       "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.4 Less Familiar Comparison",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.3 Familiar Comparisons > 3.3.1 Illustration of Comparison",
-      "[6] 2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > A. Academic Principles",
-      "[7] 2.5 Policy on Academic Disruption > II. Procedures > A. Communication and Dissemination of Information",
+      "[6] 4.9 Flags > 2.00 Definitions (2.01–2.03)",
+      "[7] Academic & Related Dates: Fall Term 2026 (12-week courses) > November, 2026",
       "[8] Laurier in the News > July 2024"
      ]
     },
     {
      "id": "Q5",
      "group": "course",
-     "seconds": 1.0,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.2,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1356,15 +1366,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > Contents",
       "[4] PC141 Lab Manual: Estimation and Bounding > Appendix A: Reference Material > A.1 Significant Figures (SigFigs)",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.6 Logarithmic Scale",
-      "[6] Policy 12.2 Student Code of Conduct: Academic Misconduct > 4.06 Notations on the Official Transcript",
-      "[7] Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > B. Misrepresentation and Fraud",
+      "[6] Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > B. Misrepresentation and Fraud",
+      "[7] Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > C. Improper Access / Obstruction",
       "[8] Calculus Preparation Evaluation, Course Registration Guide > Content Covered by the CPE"
      ]
     },
     {
      "id": "Q6",
      "group": "course",
-     "seconds": 1.3,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1375,14 +1387,16 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Header",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
-      "[6] Academic Petitions and Appeals > Forms and Faculty-Specific Information > Faculty of Science",
-      "[7] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > This is a simplified version of the procedure. Consult the Undergraduate Academic Calendar for the full procedure.",
+      "[6] Grades > Final Grade Appeals",
+      "[7] Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Late Add Of A Course",
       "[8] Professional Development - Education - Wilfrid Laurier University > Additional Qualifications > Course Information"
      ]
     },
     {
      "id": "Q7",
      "group": "course",
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
      "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
@@ -1394,15 +1408,17 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Lab Format",
       "[4] PC141 Tutorial Announcements (MyLS) > Introduction > Preparation and Materials",
       "[5] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Preparation for the First Lab",
-      "[6] Procedures for Temporary Signs and Notices (4.6) > 2.0 Brantford Campus > 2.2 Processes for Specific Areas",
-      "[7] Procedures for Temporary Signs and Notices (4.6) > 1.0 Waterloo Campus > 1.2 Processes for Specific Areas",
+      "[6] Data and Analytics Governance Framework > 3.0 Data and Analytics Governance Committees > 3.3 Data and Analytics Governance Lead",
+      "[7] Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics",
       "[8] Expectations > Respect/Sharing"
      ]
     },
     {
      "id": "Q8",
      "group": "course",
-     "seconds": 1.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1413,15 +1429,17 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Grade Review and Inquiry Policy",
       "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
-      "[6] Examinations > Assignments and Tests in the Last Week of Classes",
-      "[7] Examinations > Virtual Campus Courses: In-Person Midterms, In-Person Assessments, and In-Person Final Examinations Policy",
+      "[6] Student Regulations > Policy on Submission of Late Assignments",
+      "[7] Academic & Related Dates: Winter Term 2027 (12-week courses) > January, 2027",
       "[8] Apply for Residence - Laurier Student > Exchange Students > Terms of Your Contract > Leaving Residence"
      ]
     },
     {
      "id": "Q9",
      "group": "course",
-     "seconds": 1.0,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1433,13 +1451,15 @@
       "[4] PC141 Lab Syllabus (Fall 2026) > Schedule",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
       "[6] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
-      "[7] Student Regulations > Attendance",
-      "[8] Deferred Exams > Faculty-Specific Forms and Information > Lazaridis School of Business and Economics > Missed Exams"
+      "[7] 14.3 Election of Administrative Staff to the Board of Governors > 4.00 Policy (4.01–4.02.04)",
+      "[8] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > This is a simplified version of the procedure. Consult the Undergraduate Academic Calendar for the full procedure."
      ]
     },
     {
      "id": "Q10",
      "group": "course",
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
      "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
@@ -1451,15 +1471,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
       "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
       "[5] PC141 Lab Manual: Estimation and Bounding > 4 Summary",
-      "[6] Grades > Final Grade Appeals",
-      "[7] Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Planning",
-      "[8] Types of Appeals > Types of Appeals"
+      "[6] 9.2 Principles that Govern the Selection, Implementation and Application of Information Technologies and Services at Laurier > III. Principles > F. Applications > Implications",
+      "[7] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Extension to Course Work",
+      "[8] Types of Appeals > Overview"
      ]
     },
     {
      "id": "Q11",
      "group": "course",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1470,15 +1492,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[4] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
       "[5] PC141 Lab Syllabus (Fall 2026) > Lab Format",
-      "[6] 9.3 Classroom Use of Electronic Devices > Policy",
-      "[7] 9.3 Classroom Use of Electronic Devices > Definitions",
+      "[6] 9.3 Classroom Use of Electronic Devices > Policy (4.00)",
+      "[7] 9.3 Classroom Use of Electronic Devices > Definitions (2.00)",
       "[8] PrintMe > Using PrintMe > Printing from Laptop, Wireless Device or Off-Campus > Printing Password Protected Forms"
      ]
     },
     {
      "id": "Q12",
      "group": "course",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1491,13 +1515,15 @@
       "[5] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > What to Bring to the First Lab",
       "[6] Procedures for Temporary Signs and Notices (4.6) > 2.0 Brantford Campus > 2.2 Processes for Specific Areas",
       "[7] Procedures for Temporary Signs and Notices (4.6) > 1.0 Waterloo Campus > 1.2 Processes for Specific Areas",
-      "[8] United Food and Commercial Workers Canada Local 175 Collective ... > Article 1: Bargaining Agency"
+      "[8] Laurier researcher a key contributor to new documentary about ... > Overview"
      ]
     },
     {
      "id": "Q13",
      "group": "course",
-     "seconds": 1.5,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1508,15 +1534,17 @@
       "[3] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Preparation for the First Lab",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Introduction > Tutorial Component",
-      "[6] Procedures for Undergraduate and Graduate Student Accommodations > Accommodation Access for Placements/Practicum",
-      "[7] 11.4 Equipment and Materials Purchased through Grants and Contracts > Policy",
+      "[6] Student Regulations > Attendance",
+      "[7] Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 4.0 In the Event the University or Individual Campus or Location Closes > 4.2 Meetings and other scheduled events at the closed campus(es) or location(s) are not held.",
       "[8] LORIS > Course Registration Information > Multiple Sessions Open"
      ]
     },
     {
      "id": "Q14",
      "group": "course",
-     "seconds": 1.5,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.0,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1527,15 +1555,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
-      "[6] 9.3 Classroom Use of Electronic Devices > Definitions",
-      "[7] 9.3 Classroom Use of Electronic Devices > Policy",
+      "[6] 9.3 Classroom Use of Electronic Devices > Policy (4.00)",
+      "[7] 9.3 Classroom Use of Electronic Devices > Definitions (2.00)",
       "[8] WLUFA Collective Agreement (Full-Time) > Article 18: Duties, Responsibilities and Workload of Faculty Members"
      ]
     },
     {
      "id": "Q15",
      "group": "course",
-     "seconds": 0.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.8,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1546,15 +1576,17 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
       "[4] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Contact Information",
       "[5] PC141 Lab Announcements (MyLS) > Post lab 1 > LAB SYLLABUS > Lab Instructor Assistance (IA)",
-      "[6] 5.19 Divestment Requests Policy > 1.00 Purpose",
-      "[7] Academic Petitions and Appeals > Forms and Faculty-Specific Information > Faculty of Science",
+      "[6] Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 4.0 In the Event the University or Individual Campus or Location Closes > 4.3 Final Examinations & Assessments",
+      "[7] Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of the Accessible Learning Centre (24.00)",
       "[8] Communicating on Zoom and Teams - Laurier Student > Chat Functions"
      ]
     },
     {
      "id": "Q16",
      "group": "course",
-     "seconds": 1.1,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.7,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1565,15 +1597,17 @@
       "[3] PC141 Lab Announcements (MyLS) > Intro, Lab 1",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Tutorial Format",
-      "[6] Accessible Learning > Connect with Us",
-      "[7] 8.15 Disconnecting from Work Policy > 4.00 Policy",
-      "[8] Political Science Instructional Assistantships - Laurier Student > Position Overview"
+      "[6] 2.5 Policy on Academic Disruption > II. Procedures > B. Short Disruptions",
+      "[7] Deferred Exams > Faculty-Specific Forms and Information > Faculty of Liberal Arts",
+      "[8] Orientation and Training for Field Instructors, Faculty of Social Work > Additional Training Opportunities"
      ]
     },
     {
      "id": "Q17",
      "group": "course",
-     "seconds": 1.5,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1584,15 +1618,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Introduction > Digital Tools Policy",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
-      "[6] 7.12 Open Flames and Open Air Burning on Campus > 3.00 Jurisdiction/Scope",
-      "[7] 7.12 Open Flames and Open Air Burning on Campus > 4.00 Policy",
-      "[8] WLUFA Collective Agreement (Full-Time) > Article 18: Duties, Responsibilities and Workload of Faculty Members"
+      "[6] Procedures for Temporary Signs and Notices (4.6) > 1.0 Waterloo Campus > 1.2 Processes for Specific Areas",
+      "[7] 9.3 Classroom Use of Electronic Devices > Policy (4.00)",
+      "[8] Laurier's Campus Accessibility Timeline: 2003-2025 > 2020-2022: Notable Accomplishments > Accessibility in the Library"
      ]
     },
     {
      "id": "Q18",
      "group": "course",
-     "seconds": 0.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1604,14 +1640,16 @@
       "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
       "[6] Grades > Final Grade Appeals",
-      "[7] Fitness for Work Procedure > 4.0. Responsibilities",
+      "[7] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Final Grade Appeals > This is a simplified version of the procedure. Consult the Undergraduate Academic Calendar for the full procedure.",
       "[8] Scholarships and Awards - Laurier Student > In-Course Scholarships"
      ]
     },
     {
      "id": "Q19",
      "group": "course",
-     "seconds": 0.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.8,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1630,6 +1668,8 @@
     {
      "id": "E1",
      "group": "email",
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
      "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
@@ -1641,15 +1681,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > 4 Summary",
       "[4] PC141 Lab Announcements (MyLS) > Post lab 1",
       "[5] PC141 Lab Announcements (MyLS) > Post lab 1 > LAB SYLLABUS",
-      "[6] Lazaridis Intellectual Property Lab > Disclaimers",
-      "[7] Lazaridis Intellectual Property Lab > Overview",
-      "[8] Lazaridis Intellectual Property Lab > Overview"
+      "[6] Student Regulations > Attendance",
+      "[7] Grades > Attendance",
+      "[8] Lazaridis Intellectual Property Lab > Disclaimers"
      ]
     },
     {
      "id": "E2",
      "group": "email",
-     "seconds": 1.3,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1660,15 +1702,17 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Schedule",
       "[4] PC141 Lab Announcements (MyLS) > Post lab 1 > Estimate the Olympic swimming pool problem",
       "[5] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
-      "[6] Student Regulations > Attendance",
-      "[7] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+      "[6] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
+      "[7] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > More Than Two Weeks",
       "[8] Computer Science and Physics Student Laboratory Access > Access Categories > Supervised: Outside Scheduled Lab Periods"
      ]
     },
     {
      "id": "E3",
      "group": "email",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": true,
      "laurier_retrieved": null,
      "status": null,
@@ -1679,15 +1723,17 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Grade Review and Inquiry Policy",
       "[4] PC141 Lab Announcements (MyLS) > Post lab 1",
       "[5] PC141 Lab Syllabus (Fall 2026) > Header",
-      "[6] 8.8 Tuition Reimbursement Policy > General",
-      "[7] Procedures Relating to Burning of Traditional Medicines (7.14) > 3.0 Reviewed/Recommended Locations",
-      "[8] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Extension to Course Work"
+      "[6] Procedures Relating to Policy on University Closing Due to Severe Weather (7.6) > 4.0 In the Event the University or Individual Campus or Location Closes > 4.1 All in-person classes on the closed campus(es) or location(s) are cancelled.",
+      "[7] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Extension to Course Work",
+      "[8] Career Opportunities > Join the Laurier Team > How to Apply > Create Your Candidate Profile"
      ]
     },
     {
      "id": "E4",
      "group": "email",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": true,
      "laurier_retrieved": true,
      "status": null,
@@ -1696,14 +1742,16 @@
       "[1] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
       "[2] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.1 Estimation",
       "[3] PC141 Lab Manual: Estimation and Bounding > Appendix A: Reference Material > A.1 Significant Figures (SigFigs)",
-      "[4] Academic Misconduct Defined > Types of Academic Misconduct > Self-Plagiarism",
-      "[5] Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+      "[4] Gen AI Student Resource Hub > Gen AI and Academic Integrity > Don't Plagiarize",
+      "[5] Academic Misconduct Defined > Types of Academic Misconduct > Self-Plagiarism",
       "[6] Golden Rules for Acting with Integrity - Laurier Student > What is academic misconduct?"
      ]
     },
     {
      "id": "L1",
      "group": "laurier",
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
      "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
@@ -1714,7 +1762,7 @@
       "[2] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
       "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.4 Less Familiar Comparison",
-      "[5] Examinations > Religious Accommodations and Final Examination Scheduling",
+      "[5] Deferred Exams > Deferred Final Exams > Two Exams at the Same Time",
       "[6] Deferred Exams > Deferred Final Exams > Medical Grounds",
       "[7] Academic Accommodations > Exam Accommodations > Deferred Exams > Deferred Final Exams"
      ]
@@ -1722,26 +1770,30 @@
     {
      "id": "L2",
      "group": "laurier",
-     "seconds": 1.2,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
      "answer": null,
      "sources": [
-      "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
-      "[2] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[3] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
-      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
-      "[6] Policy 12.2 Student Code of Conduct: Academic Misconduct > 1.00 Purpose",
-      "[7] Procedures for Student Code of Conduct: Academic Misconduct > 5.0 First Offence of Academic Misconduct: Application of Penalty",
-      "[8] Code of Conduct, Petitions, and Admission Conditions > Science and Professional Experience Program (PEP) > Academics"
+      "[1] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
+      "[2] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.2 Bounding > 3.2.2 Range of Possible Values",
+      "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
+      "[4] PC141 Lab Manual: Estimation and Bounding > Appendix A: Reference Material > A.2 Scientific Notation (Standard Form)",
+      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
+      "[6] Academic Misconduct Defined > Types of Academic Misconduct > Plagiarism",
+      "[7] Academic Misconduct Defined > Types of Academic Misconduct > Impersonating Another Person in a Test or Exam",
+      "[8] Academic Petitions and Appeals > Types of Exceptions to University Undergraduate Academic Regulations > Not Accountable Term"
      ]
     },
     {
      "id": "L3",
      "group": "laurier",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1752,15 +1804,17 @@
       "[3] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Contact Information",
       "[4] PC141 Lab Syllabus (Fall 2026) > Header",
       "[5] PC141 Lab Announcements (MyLS) > Post lab 1 > LATE SUBMISSION > Deduction for late submission",
-      "[6] Adding and Dropping Courses > Overview",
-      "[7] Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+      "[6] Academic & Related Dates: Fall Term 2026 (12-week courses) > December, 2026",
+      "[7] Adding and Dropping Courses > Overview",
       "[8] Important Dates and Deadlines > Undergraduate Students > Fall 2026 – 6 weeks"
      ]
     },
     {
      "id": "L4",
      "group": "laurier",
-     "seconds": 0.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.7,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1771,15 +1825,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
       "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
-      "[6] Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of Students",
-      "[7] Policy 2.3 Academic Accommodation of Students with Disabilities > Definitions",
+      "[6] Policy 2.3 Academic Accommodation of Students with Disabilities > Policy > Responsibility of Students (20.00)",
+      "[7] Policy 2.3 Academic Accommodation of Students with Disabilities > Definitions (6.00–7.00)",
       "[8] Step 1: Registration and Documentation > Double Degree with the University of Waterloo > Laurier Students Whose Home Institution is UW"
      ]
     },
     {
      "id": "L5",
      "group": "laurier",
-     "seconds": 1.0,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1787,18 +1843,20 @@
      "sources": [
       "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[2] PC141 Tutorial Announcements (MyLS) > Introduction > Digital Tools Policy",
-      "[3] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
+      "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
+      "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.3 Familiar Comparisons",
+      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
       "[6] Gen AI Student Resource Hub > Which Tools Should I Use at Laurier?",
-      "[7] Gen AI Student Resource Hub > What is Generative AI? > AI vs. Gen AI",
-      "[8] Laurier Faculty of Education researchers prepare teachers to lead in ... > What is AIME?"
+      "[7] Academic Petitions and Appeals > Academic Petition Process > Generative AI Tools & Petition Submissions",
+      "[8] Opportunities &amp; Challenges of Generative AI Tools in Academia ... > Introduction: What you need to know"
      ]
     },
     {
      "id": "L6",
      "group": "laurier",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.1,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1810,14 +1868,16 @@
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
       "[5] PC141 Lab Announcements (MyLS) > Post lab 1 > Estimate the Olympic swimming pool problem",
       "[6] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
-      "[7] Deferred Exams > Deferred Final Exams > Medical Grounds",
-      "[8] Academic Petitions and Appeals > Academic Petition Process > Documentation > Medical Documentation Expectations"
+      "[7] Academic Petitions and Appeals > Academic Petition Process > Documentation > Medical Documentation Expectations",
+      "[8] Accommodations Explained > Classroom Accommodations > May Miss Class for Medical Reasons > Guidelines and Additional Considerations"
      ]
     },
     {
      "id": "L7",
      "group": "laurier",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.2,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1829,14 +1889,16 @@
       "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
       "[6] Academic Petitions and Appeals > Forms and Faculty-Specific Information > Lazaridis School of Business and Economics > Grade Appeal Request",
-      "[7] Grades > Calculation of Course Grade: Final Examination Not Written",
+      "[7] Grades > Final Grade Appeals",
       "[8] Fall 2022 official grades released > Appealing Final Grades"
      ]
     },
     {
      "id": "L8",
      "group": "laurier",
-     "seconds": 0.8,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1848,14 +1910,16 @@
       "[4] PC141 Lab Syllabus (Fall 2026) > Lab Format",
       "[5] PC141 Lab Announcements (MyLS) > Intro, Lab 1",
       "[6] Academic & Related Dates: Fall Term 2026 (12-week courses) > October, 2026",
-      "[7] Academic & Related Dates: Fall Term 2026 (12-week courses) > November, 2026",
+      "[7] Academic & Related Dates: Fall Term 2026 (12-week courses) > April, 2026",
       "[8] Master of Social Work > Term Dates > On-Campus Class Dates"
      ]
     },
     {
      "id": "L9",
      "group": "laurier",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1874,7 +1938,9 @@
     {
      "id": "L10",
      "group": "laurier",
-     "seconds": 0.5,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1882,9 +1948,9 @@
      "sources": [
       "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[2] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
-      "[3] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
+      "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
+      "[4] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > First Laboratory Session",
+      "[5] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Preparation for the First Lab",
       "[6] Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A First Offence",
       "[7] Policy 12.2 Student Code of Conduct: Academic Misconduct > Appendix: Penalty Guidelines for Findings of Academic Misconduct > A Second Offence",
       "[8] Procedures for Student Code of Conduct: Academic Misconduct > 5.0 First Offence of Academic Misconduct: Application of Penalty"
@@ -1893,7 +1959,9 @@
     {
      "id": "P1",
      "group": "policy",
-     "seconds": 0.9,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.3,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1902,36 +1970,40 @@
       "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
       "[2] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures",
       "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
-      "[4] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[5] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
-      "[6] 12.3 Non-Academic Student Code of Conduct > 2.00 Purpose",
-      "[7] 12.3 Non-Academic Student Code of Conduct > 4.00 Jurisdiction/Scope",
-      "[8] Freedom of Expression > Policy Framework"
+      "[4] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
+      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
+      "[6] Procedures for Non-Academic Student Code of Conduct > Overview",
+      "[7] 12.3 Non-Academic Student Code of Conduct > 2.00 Purpose (2.01–2.02)",
+      "[8] Residence Code of Conduct > Residence Code of Conduct > Section 9: Non-Cooperation/Non-Compliance"
      ]
     },
     {
      "id": "P2",
      "group": "policy",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.1,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
      "answer": null,
      "sources": [
       "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Academic Integrity in Tutorials",
-      "[2] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
-      "[4] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Grade Review and Inquiry Policy",
-      "[6] 12.5 Student Mental Health Policy > 5.00 Privacy and Confidentiality",
-      "[7] 12.5 Student Mental Health Policy > 11.00 Community of Care",
-      "[8] Student Wellness Centre > In this section"
+      "[2] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
+      "[3] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Grade Review and Inquiry Policy",
+      "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Digital Devices & Participation Policy",
+      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
+      "[6] 12.5 Student Mental Health Policy > Related Policies, Procedures and Documents (8.10)",
+      "[7] 12.5 Student Mental Health Policy > Relevant Legislation",
+      "[8] Sandy Rao > Overview"
      ]
     },
     {
      "id": "P3",
      "group": "policy",
-     "seconds": 1.0,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.4,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1942,34 +2014,38 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Open-Book Written Tutorial Report",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
-      "[6] 9.3 Classroom Use of Electronic Devices > Policy",
-      "[7] 9.3 Classroom Use of Electronic Devices > Policy > Obligations of Instructor",
+      "[6] 9.3 Classroom Use of Electronic Devices > Policy > Obligations of Instructor",
+      "[7] 9.3 Classroom Use of Electronic Devices > Policy (4.00)",
       "[8] 9.1 Use of Information Technology > 4.00 Policy > 4.01 General Rules"
      ]
     },
     {
      "id": "P4",
      "group": "policy",
-     "seconds": 1.4,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
      "answer": null,
      "sources": [
-      "[1] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[2] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
-      "[4] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > What to Bring to the First Lab",
-      "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
+      "[1] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Attendance and Grading Policies",
+      "[2] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > What to Bring to the First Lab",
+      "[3] PC141 Lab Manual: Estimation and Bounding > Header",
+      "[4] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
+      "[5] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
       "[6] 10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 1.0. Purpose",
-      "[7] 10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > 3.0. Procedure > 3.1. Information included in the Student Academic Record",
+      "[7] 10.2 Appendix A: Documents Included in the Student Academic Record and Official Academic Transcript > Overview",
       "[8] 10.2 Student Academic Record > 2.00 Definitions"
      ]
     },
     {
      "id": "P5",
      "group": "policy",
-     "seconds": 1.1,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.9,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -1981,31 +2057,32 @@
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Introduction > Tutorial Component",
       "[6] 2.5 Policy on Academic Disruption > II. Procedures > B. Short Disruptions",
-      "[7] 2.5 Policy on Academic Disruption > I. Principles Regarding Disruptions of Academic Programs > B. Definitions",
+      "[7] Managing Unexpected Academic Disruptions > Types of Short-Term Absences > Less Than One Week",
       "[8] Residence > In this section"
      ]
     },
     {
      "id": "P6",
      "group": "policy",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.8,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
      "answer": null,
      "sources": [
-      "[1] PC141 Lab Manual: Estimation and Bounding > Header",
-      "[2] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.1 Example: How many gold parking spaces are there at Laurier?",
-      "[3] PC141 Lab Manual: Estimation and Bounding > Contents",
-      "[4] 12.4 Gendered and Sexual Violence > 5.00 Policy",
-      "[5] 12.4 Gendered and Sexual Violence > 2.00 Purpose",
-      "[6] Sexual Violence Response Certificate - Laurier Student > Fall 2026 - Winter 2027 > Responding to Disclosures of Gendered and Sexual Violence"
+      "[1] 12.4 Gendered and Sexual Violence > 5.00 Policy (5.08–5.10)",
+      "[2] 12.4 Gendered and Sexual Violence > 3.00 Definitions (3.06–3.09)",
+      "[3] Sexual Violence Response Certificate - Laurier Student > Fall 2026 - Winter 2027 > Responding to Disclosures of Gendered and Sexual Violence"
      ]
     },
     {
      "id": "S1",
      "group": "search",
-     "seconds": 1.2,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -2024,7 +2101,9 @@
     {
      "id": "S2",
      "group": "search",
-     "seconds": 1.2,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.5,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -2035,15 +2114,17 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
       "[4] PC141 Tutorial Announcements (MyLS) > Introduction > Digital Tools Policy",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.5 Order of Magnitude Calculations > 3.5.2 Illustration of Order of Magnitude Calculation",
-      "[6] Procedures for Student Mental Health Policy (12.5) > 1.0 Reporting",
-      "[7] The Wilfrid Laurier University Act, 1973, as Amended, 2001 and 2016 > General > First election and appointment of Board of Governors and Senate",
-      "[8] Parking > Waterloo Campus Parking > Public Transit"
+      "[6] Procedures for Temporary Signs and Notices (4.6) > 1.0 Waterloo Campus > 1.2 Processes for Specific Areas",
+      "[7] 7.2 Animals on Campus > 2.00 Definitions (2.10–2.12)",
+      "[8] Parking > Waterloo > Waterloo Campus Parking > Public Transit"
      ]
     },
     {
      "id": "S3",
      "group": "search",
-     "seconds": 0.5,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.7,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -2054,8 +2135,8 @@
       "[3] PC141 Lab Syllabus (Fall 2026) > Description",
       "[4] PC141 Tutorial Announcements (MyLS) > Introduction > Tutorial Component",
       "[5] PC141 Lab Syllabus (Fall 2026) > Lab Format",
-      "[6] Examinations > Examination Regulations for Candidates",
-      "[7] Examinations > Virtual Campus Courses: In-Person Midterms, In-Person Assessments, and In-Person Final Examinations Policy",
+      "[6] Procedures for Building and Interior Access (4.5) > 1.0. Roles and Responsibilities > 1.2. OneCard Office",
+      "[7] 10.1 Privacy Protection and Information Access Policy > 2.00 Definitions (2.01–2.04)",
       "[8] How to Get a OneCard > Milton campus Students, Staff and Faculty"
      ]
     },
@@ -2063,8 +2144,8 @@
      "id": "S4",
      "group": "search",
      "date": "2026-11-05",
-     "url": "http://127.0.0.1:8787",
-     "seconds": 1.0,
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": true,
      "status": null,
@@ -2075,15 +2156,17 @@
       "[3] PC141 Lab Announcements (MyLS) > Intro, Lab 1",
       "[4] PC141 Lab Manual: Estimation and Bounding > 2 Introduction",
       "[5] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > What to Bring to the First Lab",
-      "[6] 11.7 Financial Administration of Research-Related Fund Accounts > V. Deficits",
-      "[7] Procedure for Reporting Fraud (5.18) > 1.0. Notification",
+      "[6] Policy 12.2 Student Code of Conduct: Academic Misconduct > Relevant Administrators by Faculty",
+      "[7] 4.7 Performance Facilities > II. Performance Facilities Committee > B. Membership",
       "[8] Faculty of Science Faculty and Staff - Wilfrid Laurier University > Dean of Science Office > Faculty"
      ]
     },
     {
      "id": "U1",
      "group": "unanswerable",
-     "seconds": 0.6,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.9,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -2094,15 +2177,17 @@
       "[3] PC141 Lab Manual: Estimation and Bounding > 4 Summary",
       "[4] PC141 Lab Syllabus (Fall 2026) > Learning Outcomes",
       "[5] PC141 Lab Manual: Estimation and Bounding > 3 Theory and Procedure > 3.4 Less Familiar Comparison",
-      "[6] Examinations > Religious Accommodations and In-term Test/Midterm Exam Scheduling",
-      "[7] Grades > Grading System",
-      "[8] Grades > Grading System"
+      "[6] Grades > Grading System",
+      "[7] Examinations > Religious Accommodations and In-term Test/Midterm Exam Scheduling",
+      "[8] Deferred Exams > Deferred Final Exams > Two Exams at the Same Time"
      ]
     },
     {
      "id": "U2",
      "group": "unanswerable",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -2113,31 +2198,38 @@
       "[3] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > Preparation for the First Lab",
       "[4] PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Attendance and Makeup Policy",
       "[5] PC141 Tutorial Announcements (MyLS) > Tutorial Policies and Procedures > Permitted Resources",
-      "[6] 11.5 Use of Animals in Research, Testing and Teaching > Purpose",
-      "[7] Procedures Related to Policy 11.14 Responsible Conduct of Research > 1.0 Purpose",
+      "[6] Procedure for Authorized Access to the Core Web Properties (3.3) > 6.0. Terms of Use > 6.4. Edits, Deletion and Modification",
+      "[7] Gen AI Student Resource Hub > Gen AI and Academic Integrity > Follow Copyright",
       "[8] Health Sciences (BSc) > Courses and Program Enhancements > Sample First-Year Electives"
      ]
     },
     {
      "id": "U3",
      "group": "unanswerable",
-     "seconds": 0.7,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
      "answer": null,
      "sources": [
-      "[1] PC141 Lab Syllabus (Fall 2026) > Header",
-      "[2] PC141 Lab Manual: Estimation and Bounding > Header",
+      "[1] PC141 Lab Manual: Estimation and Bounding > Header",
+      "[2] PC141 Lab Syllabus (Fall 2026) > Header",
       "[3] PC141 Tutorial Announcements (MyLS) > Introduction > Tutorial Component",
       "[4] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > What to Bring to the First Lab",
-      "[5] PC141 Tutorial Announcements (MyLS) > Introduction > Preparation and Materials"
+      "[5] PC141 Tutorial Announcements (MyLS) > Introduction > Preparation and Materials",
+      "[6] 9.1 Use of Information Technology > 4.00 Policy > 4.04 Inappropriate Use (4.04.01)",
+      "[7] Merchant Card Use Procedures > Establishing Merchant Accounts Procedures > Procedures",
+      "[8] 9.2 Principles that Govern the Selection, Implementation and Application of Information Technologies and Services at Laurier > III. Principles > B. General Principles > Implications"
      ]
     },
     {
      "id": "U4",
      "group": "unanswerable",
-     "seconds": 0.8,
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
+     "seconds": 1.0,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
      "status": null,
@@ -2156,6 +2248,8 @@
     {
      "id": "U5",
      "group": "unanswerable",
+     "date": "2026-11-05",
+     "url": "https://wlu-rag-api.nobodyknownothing.workers.dev",
      "seconds": 0.6,
      "pc141_retrieved": null,
      "laurier_retrieved": null,
@@ -2167,9 +2261,9 @@
       "[3] PC141 Tutorial Announcements (MyLS) > Introduction > PC141 Tutorial Schedule — First class",
       "[4] PC141 Lab Announcements (MyLS) > Intro, Lab 1 > First Laboratory Session",
       "[5] PC141 Lab Syllabus (Fall 2026) > Header",
-      "[6] 7.12 Open Flames and Open Air Burning on Campus > 1.00 Purpose",
-      "[7] 7.12 Open Flames and Open Air Burning on Campus > Related Policies, Procedures and Documents",
-      "[8] Program Requirements > UTP Stage II"
+      "[6] Accessible Learning > Accommodations > Deadlines",
+      "[7] Deferred Exams > Deferred Midterms",
+      "[8] Science Academic Advising > Other Resources in the Science Academic Advising Office > Academic Integrity and Accommodations Coordinator"
      ]
     }
    ]

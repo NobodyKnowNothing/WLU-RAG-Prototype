@@ -72,9 +72,18 @@ export async function search(adapter, query, opts = {}) {
   const t0 = Date.now();
   const expanded = expandQuery(query);
   const match = ftsQuery(expanded);
+  // Vector search needs a query embedding, which fails once Workers AI's daily allowance is used up.
+  // Keyword search needs only the database, so the results degrade instead of disappearing.
+  let degraded;
   const [lexical, dense] = await Promise.all([
     match ? adapter.lexical(match, pool, kinds) : [],
-    useDense ? adapter.embed(expanded).then((v) => adapter.dense(v, pool, kinds)) : [],
+    useDense
+      ? adapter.embed(expanded).then((v) => adapter.dense(v, pool, kinds)).catch((e) => {
+          if (!match) throw e;
+          degraded = `keyword results only: vector search failed (${String(e.message || e).slice(0, 200)})`;
+          return [];
+        })
+      : [],
   ]);
   const t1 = Date.now();
   const fused = rrf([lexical.map((r) => [r.id, r.score]), dense.map((r) => [r.id, r.score])]).slice(0, rerankPool);
@@ -99,6 +108,7 @@ export async function search(adapter, query, opts = {}) {
     expanded: expanded !== query ? expanded : undefined,
     kinds,
     reranked: useRerank,
+    ...(degraded && { degraded }),
     results,
     candidates: { lexical: lexical.length, dense: dense.length, fused: fused.length },
     timings: { retrieveMs: t1 - t0, totalMs: Date.now() - t0 },
@@ -118,9 +128,9 @@ export async function catalog(adapter, kinds) {
 }
 
 // Plain-text rendering for an agent's context window.
-export function renderResults({ results }) {
+export function renderResults({ results, degraded }) {
   if (!results.length) return "No indexed Laurier policy section matches this query.";
-  return results
+  return (degraded ? `Note: ${degraded}\n\n` : "") + results
     .map((h, i) => `[${i + 1}] ${h.citation}\n(${h.publisher}; ${authorityLabel(h.authority)}${h.revised ? `, last revised ${h.revised}` : ""})\nURL: ${h.url}\nid: ${h.id}\n${h.text}`)
     .join("\n\n");
 }
