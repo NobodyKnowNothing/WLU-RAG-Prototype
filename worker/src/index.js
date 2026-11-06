@@ -3,7 +3,9 @@ import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
 import { cloudflareAdapter } from "../../policy_index/src/cloudflare-adapter.mjs";
 import { search as searchPolicyIndex } from "../../policy_index/src/search.mjs";
 import { mcpHttp } from "../../policy_index/src/tool.mjs";
-import { RESPONSE_SCHEMA, SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
+import { SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
+import { SHORT_TTL_S, TTL_S, answerCache, cacheKey } from "./cache.js";
+import { complete, usageCounter } from "./llm.js";
 import { CATALOG, searchLaurier } from "./laurier.js";
 import { BM25, cosine, expandQuery, rrf } from "./retrieval.js";
 
@@ -12,7 +14,6 @@ const policyIndex = (env) => (env.POLICY_DB && env.POLICY_INDEX ? cloudflareAdap
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
-const LLM_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const TOP_K = 150;
 const PC141_TOP_N = 5;
 const LAURIER_TOP_N = 3;
@@ -82,45 +83,58 @@ async function retrieve(env, ctx, { question, mode, scope, sections }) {
   return { sources, pages: laurier.pages, links: laurier.links || [] };
 }
 
-async function generate(env, question, sources, sections) {
-  const run = () =>
-    env.AI.run(LLM_MODEL, {
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserMessage(question, sources, sections) },
-      ],
-      response_format: { type: "json_schema", json_schema: RESPONSE_SCHEMA },
-      temperature: 0.1,
-      max_tokens: 1200,
-    });
-  const res = await stage("generate", run().catch(run)); // one retry for transient model errors
-  let out = res.response ?? res.choices?.[0]?.message?.content;
-  if (typeof out === "string") {
-    try {
-      out = JSON.parse(out);
-    } catch {
-      out = { status: "not_found", pc141: [], laurier: [], unverified: "The model returned an unreadable answer." };
-    }
-  }
-  return out;
-}
+const generate = (env, question, sources, sections) =>
+  complete(env, { system: SYSTEM_PROMPT, user: buildUserMessage(question, sources, sections) }, { usage: usageCounter(env.POLICY_DB || null) });
 
 const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, authority, revised, viaSearch, viaIndex, fetchedAt, text, intro, score }) =>
   kind === "pc141"
     ? { n, kind, title, section, pages, file: source, text, ...(intro && { intro }), score }
     : { n, kind, title, section, page: pageId, publisher, authority, ...(revised && { revised }), ...(viaSearch && { viaSearch }), ...(viaIndex && { viaIndex }), url, fetchedAt, text, score };
 
-async function ask(env, ctx, req) {
+async function answer(env, ctx, req) {
   const t0 = Date.now();
   const { sources, pages, links } = await retrieve(env, ctx, req);
   const t1 = Date.now();
   const base = { mode: req.mode, scope: req.scope, sources: sources.map(publicSource), laurierPages: pages, laurierLinks: links };
   if (req.retrieveOnly) return { ...base, timings: { retrieveMs: t1 - t0 } };
   // Nothing relevant anywhere: say so without asking the model to improvise.
-  const result = sources.length
-    ? verifyAnswer(await generate(env, req.question, sources, req.sections), sources)
-    : { status: "not_found", pc141: [], laurier: [], unverified: "No PC141 document or official Laurier page that was searched covers this question." };
-  return { ...base, ...result, answer: answerText(result), timings: { retrieveMs: t1 - t0, generateMs: Date.now() - t1 } };
+  if (!sources.length) {
+    const result = { status: "not_found", pc141: [], laurier: [], unverified: "No PC141 document or official Laurier page that was searched covers this question." };
+    return { ...base, ...result, answer: answerText(result), timings: { retrieveMs: t1 - t0 } };
+  }
+  const gen = await stage("generate", generate(env, req.question, sources, req.sections));
+  const result = verifyAnswer(gen.answer, sources);
+  const llm = { provider: gen.provider, model: gen.model, ...(gen.budgetReached && { budgetReached: true }), ...(gen.fallback && { fallback: gen.fallback }) };
+  return { ...base, ...result, answer: answerText(result), llm, timings: { retrieveMs: t1 - t0, generateMs: Date.now() - t1 }, ...(!gen.readable && { unreadable: true }) };
+}
+
+// Identical questions asked at the same time share one answer instead of each calling the models.
+const inflight = new Map();
+
+async function ask(env, ctx, req) {
+  if (req.retrieveOnly) return answer(env, ctx, req); // cheap, and scripts/ai_budget.py relies on it reaching Workers AI
+  const t0 = Date.now();
+  const cache = answerCache(env.POLICY_DB || env.ANSWER_CACHE_DB);
+  const key = await cacheKey(req);
+  if (req.cache) {
+    const hit = await cache.get(key);
+    if (hit) return { ...hit, cached: true, timings: { cacheMs: Date.now() - t0, original: hit.timings } };
+    if (inflight.has(key)) return { ...(await inflight.get(key)), shared: true };
+  }
+  const p = answer(env, ctx, req);
+  inflight.set(key, p);
+  try {
+    const out = await p;
+    const { unreadable, ...stored } = out;
+    if (!unreadable) {
+      // Answers built with a Laurier page missing are kept briefly, so a complete answer replaces them.
+      const ttl = out.laurierPages.some((pg) => pg.error) ? SHORT_TTL_S : TTL_S;
+      ctx.waitUntil(cache.put(key, { ...stored, cachedAt: new Date().toISOString() }, ttl));
+    }
+    return stored;
+  } finally {
+    inflight.delete(key);
+  }
 }
 
 async function meta(env) {
@@ -138,7 +152,7 @@ async function meta(env) {
 }
 
 function parseRequest(body) {
-  const { question, mode = "full", scope = "both", retrieveOnly = false } = body || {};
+  const { question, mode = "full", scope = "both", retrieveOnly = false, cache = true } = body || {};
   const sections = body?.sections && typeof body.sections === "object" ? body.sections : {};
   if (typeof question !== "string" || !question.trim() || question.length > 500) return { error: "question must be a non-empty string under 500 characters" };
   if (!MODES.includes(mode)) return { error: `mode must be one of: ${MODES.join(", ")}` };
@@ -150,6 +164,7 @@ function parseRequest(body) {
     scope,
     sections: { lab: pick(sections.lab, SECTION_CODES.lab), tutorial: pick(sections.tutorial, SECTION_CODES.tutorial) },
     retrieveOnly: retrieveOnly === true,
+    cache: cache !== false, // false: skip the cached answer (a fresh one is still stored)
   };
 }
 

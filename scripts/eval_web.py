@@ -23,8 +23,9 @@ DEFAULT_URL = "https://wlu-rag-api.nobodyknownothing.workers.dev"
 RESULTS = root / "results" / "web_eval.json"
 
 
-def ask(url, item, mode, retrieve_only):
-    body = {"question": item["question"], "mode": mode, "scope": "both", "retrieveOnly": retrieve_only}
+def ask(url, item, mode, retrieve_only, use_cache=False):
+    # Cached answers may come from older code, so evaluations ask for a fresh answer by default.
+    body = {"question": item["question"], "mode": mode, "scope": "both", "retrieveOnly": retrieve_only, "cache": use_cache}
     if item.get("sections"):
         body["sections"] = item["sections"]
     req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "User-Agent": "pc141-eval/1.0"})  # Cloudflare blocks Python-urllib's default agent
@@ -128,6 +129,7 @@ def main():
     ap.add_argument("--ids", help="comma-separated question ids (default: all)")
     ap.add_argument("--retrieve-only", action="store_true")
     ap.add_argument("--merge", action="store_true", help="keep the stored rows for questions not re-run")
+    ap.add_argument("--use-cache", action="store_true", help="accept the Worker's cached answers (saves model calls)")
     args = ap.parse_args()
 
     items = json.loads((root / "data" / "web_eval.json").read_text(encoding="utf-8"))
@@ -141,7 +143,7 @@ def main():
         rows = []
         for item in chosen:
             t0 = time.time()
-            r = ask(args.url, item, mode, args.retrieve_only)
+            r = ask(args.url, item, mode, args.retrieve_only, args.use_cache)
             if "error" in r and re.search(r"4006|daily_limit|daily free allocation", r["error"]):
                 # Every further answer would fail the same way until the allowance comes back; stop and keep what ran.
                 print(f"{mode:6} {item['id']:4} stopped: the Workers AI daily allowance is used up", flush=True)

@@ -228,6 +228,15 @@
     );
   }
 
+  // "Full retrieval · answered via Groq · 2.1 s", or "· cached answer" when the Worker reused a stored one.
+  function footer(data) {
+    const t = data.timings || {};
+    const parts = [`${data.mode === "simple" ? "Simple" : "Full"} retrieval`];
+    if (data.llm?.provider === "groq") parts.push("answered via Groq");
+    parts.push(data.cached ? "cached answer" : `${(((t.retrieveMs || 0) + (t.generateMs || 0)) / 1000).toFixed(1)} s`);
+    return parts.join(" · ");
+  }
+
   function render(data) {
     if (!Array.isArray(data.pc141)) {
       // An older API without separated, verified claims: show its plain answer.
@@ -249,7 +258,7 @@
         ...pages.flatMap((p, i) => [i ? ", " : "", el("a", { href: safeUrl(p.url), target: "_blank", rel: "noopener", textContent: p.title }), p.viaSearch ? " (via site search)" : "", p.error ? ` (unavailable: ${p.error})` : ""])),
       data.laurierLinks?.length > 0 && el("p", { className: "pages" }, "Related files and forms (found by Laurier site search, not read): ",
         ...data.laurierLinks.flatMap((l, i) => [i ? ", " : "", el("a", { href: safeUrl(l.url), target: "_blank", rel: "noopener", textContent: l.title })])),
-      el("p", { className: "muted", textContent: `${data.mode === "simple" ? "Simple" : "Full"} retrieval · ${((data.timings.retrieveMs + (data.timings.generateMs || 0)) / 1000).toFixed(1)} s` })
+      el("p", { className: "muted", textContent: footer(data) })
     );
   }
 
