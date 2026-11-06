@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, test } from "node:test";
 import { answerCache, cacheKey, clearMemory, normalizeQuestion } from "../src/cache.js";
-import { GROQ_MODEL, WORKERS_AI_MODEL, complete, parseAnswer, resetWorkersAiState, skipWorkersAi } from "../src/llm.js";
+import { DEFAULT_DAILY_ANSWERS, GROQ_MODEL, WORKERS_AI_MODEL, complete, dailyAnswerBudget, parseAnswer, resetUsage, resetWorkersAiState, skipWorkersAi, usageCounter } from "../src/llm.js";
 
 const ANSWER = { status: "answered", pc141: [], laurier: [], unverified: "" };
 const PROMPT = { system: "sys", user: "question" };
@@ -15,6 +15,7 @@ const groqOk = (content = JSON.stringify(ANSWER)) => {
 
 beforeEach(() => {
   resetWorkersAiState();
+  resetUsage();
   clearMemory();
 });
 
@@ -67,6 +68,44 @@ test("when both providers are out, the error still reads as the daily limit", as
   const fetchImpl = async () => (calls++, new Response('{"error":{"message":"Rate limit reached"}}', { status: 429 }));
   await assert.rejects(complete(env, PROMPT, { fetchImpl }), (e) => /\b4006\b/.test(e.message) && /Groq: HTTP 429/.test(e.message));
   assert.equal(calls, 1, "no retry on Groq's 429");
+});
+
+test("after the daily Workers AI answer budget, Groq answers first and Workers AI is not called", async () => {
+  const env = { AI: ai(async () => ({ response: ANSWER })), GROQ_API_KEY: "test-key", WORKERS_AI_DAILY_ANSWERS: "2" };
+  const fetchImpl = groqOk();
+  const providers = [];
+  for (let i = 0; i < 4; i++) providers.push((await complete(env, PROMPT, { fetchImpl })).provider);
+  assert.deepEqual(providers, ["workers-ai", "workers-ai", "groq", "groq"]);
+  assert.equal(env.AI.calls, 2);
+  const r = await complete(env, PROMPT, { fetchImpl });
+  assert.equal(r.budgetReached, true);
+  assert.equal(r.fallback, undefined);
+});
+
+test("past the budget, Workers AI still answers when Groq is rate-limited", async () => {
+  const env = { AI: ai(async () => ({ response: ANSWER })), GROQ_API_KEY: "test-key", WORKERS_AI_DAILY_ANSWERS: "0" };
+  const fetchImpl = async () => new Response("{}", { status: 429 });
+  const r = await complete(env, PROMPT, { fetchImpl });
+  assert.equal(r.provider, "workers-ai");
+  assert.match(r.fallback, /Groq: HTTP 429/);
+});
+
+test("the budget applies only with a Groq key, and defaults when unset or invalid", async () => {
+  assert.equal(dailyAnswerBudget({}), DEFAULT_DAILY_ANSWERS);
+  assert.equal(dailyAnswerBudget({ WORKERS_AI_DAILY_ANSWERS: "abc" }), DEFAULT_DAILY_ANSWERS);
+  assert.equal(dailyAnswerBudget({ WORKERS_AI_DAILY_ANSWERS: 0 }), 0);
+  const env = { AI: ai(async () => ({ response: ANSWER })), WORKERS_AI_DAILY_ANSWERS: "0" };
+  assert.equal((await complete(env, PROMPT)).provider, "workers-ai");
+});
+
+test("the daily answer count is shared through D1 and starts again each UTC day", async () => {
+  const db = fakeD1();
+  const day1 = Date.parse("2026-11-06T23:00:00Z");
+  await usageCounter(db).add(day1);
+  await usageCounter(db).add(day1);
+  resetUsage(); // another isolate
+  assert.equal(await usageCounter(db).today(day1), 2);
+  assert.equal(await usageCounter(db).today(day1 + 2 * 3600_000), 0);
 });
 
 test("model output is parsed from objects, strings and fenced JSON", () => {

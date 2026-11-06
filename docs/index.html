@@ -228,11 +228,11 @@
     );
   }
 
-  // "Full retrieval · Groq backup · 2.1 s", or "· cached answer" when the Worker reused a stored one.
+  // "Full retrieval · answered via Groq · 2.1 s", or "· cached answer" when the Worker reused a stored one.
   function footer(data) {
     const t = data.timings || {};
-    const parts = [data.degraded ? "Keyword retrieval (AI allowance used up)" : `${data.mode === "simple" ? "Simple" : "Full"} retrieval`];
-    if (data.llm?.provider === "groq") parts.push("answered by the Groq backup");
+    const parts = [`${data.mode === "simple" ? "Simple" : "Full"} retrieval`];
+    if (data.llm?.provider === "groq") parts.push("answered via Groq");
     parts.push(data.cached ? "cached answer" : `${(((t.retrieveMs || 0) + (t.generateMs || 0)) / 1000).toFixed(1)} s`);
     return parts.join(" · ");
   }

@@ -5,7 +5,7 @@ import { search as searchPolicyIndex } from "../../policy_index/src/search.mjs";
 import { mcpHttp } from "../../policy_index/src/tool.mjs";
 import { SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
 import { SHORT_TTL_S, TTL_S, answerCache, cacheKey } from "./cache.js";
-import { complete, isQuotaError, markWorkersAiOut, skipWorkersAi } from "./llm.js";
+import { complete, usageCounter } from "./llm.js";
 import { CATALOG, searchLaurier } from "./laurier.js";
 import { BM25, cosine, expandQuery, rrf } from "./retrieval.js";
 
@@ -83,32 +83,19 @@ async function retrieve(env, ctx, { question, mode, scope, sections }) {
   return { sources, pages: laurier.pages, links: laurier.links || [] };
 }
 
-const generate = (env, question, sources, sections) => complete(env, { system: SYSTEM_PROMPT, user: buildUserMessage(question, sources, sections) });
+const generate = (env, question, sources, sections) =>
+  complete(env, { system: SYSTEM_PROMPT, user: buildUserMessage(question, sources, sections) }, { usage: usageCounter(env.POLICY_DB || null) });
 
 const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, authority, revised, viaSearch, viaIndex, fetchedAt, text, intro, score }) =>
   kind === "pc141"
     ? { n, kind, title, section, pages, file: source, text, ...(intro && { intro }), score }
     : { n, kind, title, section, page: pageId, publisher, authority, ...(revised && { revised }), ...(viaSearch && { viaSearch }), ...(viaIndex && { viaIndex }), url, fetchedAt, text, score };
 
-// Full retrieval needs Workers AI for the query embedding and the reranker. When its allowance is
-// used up (and Groq can still write the answer), retrieval falls back to Simple mode's keyword search.
-const DEGRADED = "Workers AI's daily allowance is used up, so this answer used keyword search (Simple retrieval)";
-async function retrieveWithFallback(env, ctx, req) {
-  if (req.mode === "full" && skipWorkersAi(env)) return { ...(await retrieve(env, ctx, { ...req, mode: "simple" })), degraded: DEGRADED };
-  try {
-    return await retrieve(env, ctx, req);
-  } catch (e) {
-    if (req.mode !== "full" || !isQuotaError(e) || !env.GROQ_API_KEY) throw e;
-    markWorkersAiOut();
-    return { ...(await retrieve(env, ctx, { ...req, mode: "simple" })), degraded: DEGRADED };
-  }
-}
-
 async function answer(env, ctx, req) {
   const t0 = Date.now();
-  const { sources, pages, links, degraded } = await retrieveWithFallback(env, ctx, req);
+  const { sources, pages, links } = await retrieve(env, ctx, req);
   const t1 = Date.now();
-  const base = { mode: req.mode, scope: req.scope, ...(degraded && { degraded }), sources: sources.map(publicSource), laurierPages: pages, laurierLinks: links };
+  const base = { mode: req.mode, scope: req.scope, sources: sources.map(publicSource), laurierPages: pages, laurierLinks: links };
   if (req.retrieveOnly) return { ...base, timings: { retrieveMs: t1 - t0 } };
   // Nothing relevant anywhere: say so without asking the model to improvise.
   if (!sources.length) {
@@ -117,7 +104,7 @@ async function answer(env, ctx, req) {
   }
   const gen = await stage("generate", generate(env, req.question, sources, req.sections));
   const result = verifyAnswer(gen.answer, sources);
-  const llm = { provider: gen.provider, model: gen.model, ...(gen.fallback && { fallback: gen.fallback }) };
+  const llm = { provider: gen.provider, model: gen.model, ...(gen.budgetReached && { budgetReached: true }), ...(gen.fallback && { fallback: gen.fallback }) };
   return { ...base, ...result, answer: answerText(result), llm, timings: { retrieveMs: t1 - t0, generateMs: Date.now() - t1 }, ...(!gen.readable && { unreadable: true }) };
 }
 
@@ -140,8 +127,8 @@ async function ask(env, ctx, req) {
     const out = await p;
     const { unreadable, ...stored } = out;
     if (!unreadable) {
-      // Answers built on degraded retrieval or with a page missing are kept briefly, so a full answer replaces them.
-      const ttl = out.degraded || out.laurierPages.some((pg) => pg.error) ? SHORT_TTL_S : TTL_S;
+      // Answers built with a Laurier page missing are kept briefly, so a complete answer replaces them.
+      const ttl = out.laurierPages.some((pg) => pg.error) ? SHORT_TTL_S : TTL_S;
       ctx.waitUntil(cache.put(key, { ...stored, cachedAt: new Date().toISOString() }, ttl));
     }
     return stored;

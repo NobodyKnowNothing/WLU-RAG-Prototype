@@ -7,7 +7,7 @@
 // Bump when retrieval, the prompt or the answer format changes, so old answers stop being served.
 export const CACHE_VERSION = 1;
 export const TTL_S = 24 * 3600; // course documents are fixed; the policy index re-syncs weekly
-export const SHORT_TTL_S = 2 * 3600; // degraded answers: replaced by a full one once AI is back
+export const SHORT_TTL_S = 2 * 3600; // answers with a Laurier page unavailable: retried sooner
 const MEMORY_MAX = 200;
 
 // Case, spacing and trailing punctuation don't change the answer.

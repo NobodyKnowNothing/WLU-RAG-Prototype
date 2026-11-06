@@ -290,7 +290,11 @@ export async function searchLaurier(query, { question = query, mode, k, ctx, rer
     // keyword-only; Full adds vector search. If the index is down, fall back to live pages.
     // Site search runs alongside and skips only the pages the index search returned: it can still
     // bring in an indexed page the index ranked lower (as it did for pages the router didn't pick).
-    const indexed = searchIndex(index, question, { k: INDEX_POOL[mode] || INDEX_POOL.full, dense: mode !== "simple", rerank: false }).catch((e) => ((indexError = String(e.message || e)), null));
+    // In Full mode a keyword-only index result (its vector search failed) isn't used: the live
+    // catalog path below reranks with the cross-encoder instead, or fails if Workers AI is out.
+    const indexed = searchIndex(index, question, { k: INDEX_POOL[mode] || INDEX_POOL.full, dense: mode !== "simple", rerank: false })
+      .then((f) => (mode !== "simple" && f.degraded ? Promise.reject(new Error(f.degraded)) : f))
+      .catch((e) => ((indexError = String(e.message || e)), null));
     // Simple mode uses the first k - 1 index hits (one slot is kept for site search); Full mode
     // reranks all of them.
     const used = mode === "simple" ? k - 1 : Infinity;

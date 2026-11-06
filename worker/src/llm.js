@@ -1,6 +1,9 @@
-// Answer generation: Llama 3.3 70B on Workers AI, with the same model on Groq as a backup for when
-// the Workers AI daily allowance is used up (or Workers AI fails). Groq is used only when the
-// GROQ_API_KEY secret is set.
+// Answer generation: Llama 3.3 70B on Workers AI, and the same model on Groq (when the GROQ_API_KEY
+// secret is set). Workers AI's daily allowance is shared with retrieval (query embeddings and the
+// reranker), and Llama uses about 120 neurons an answer against a fraction of a neuron for a
+// retrieval. So Workers AI writes only the first WORKERS_AI_DAILY_ANSWERS answers of each UTC day,
+// then Groq takes over, and the rest of the allowance keeps vector retrieval running. Either
+// provider backs up the other when it fails.
 import { RESPONSE_SCHEMA } from "./answer.js";
 
 export const WORKERS_AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
@@ -84,27 +87,78 @@ async function groq(env, system, user, fetchImpl = fetch) {
   return call().catch((e) => (e.status === 429 ? Promise.reject(e) : call()));
 }
 
-// Returns { answer, readable, provider, model, fallback? }. Throws when every provider failed; the
-// message keeps each provider's error, so a used-up allowance still reads as error 4006.
-export async function complete(env, { system, user }, { fetchImpl = fetch, now = Date.now() } = {}) {
+export const DEFAULT_DAILY_ANSWERS = 25; // the allowance has run out after as few as 41 answers
+export const dailyAnswerBudget = (env) => {
+  const n = Number(env.WORKERS_AI_DAILY_ANSWERS);
+  return env.WORKERS_AI_DAILY_ANSWERS !== undefined && env.WORKERS_AI_DAILY_ANSWERS !== "" && Number.isFinite(n) && n >= 0 ? n : DEFAULT_DAILY_ANSWERS;
+};
+
+// Answers Workers AI has written today (UTC), shared by every isolate through D1. Without a database,
+// or if it fails, the count is kept per isolate.
+const memoryCounts = new Map();
+export const resetUsage = () => memoryCounts.clear();
+const USAGE_SCHEMA = "CREATE TABLE IF NOT EXISTS ai_usage (day TEXT PRIMARY KEY, answers INTEGER NOT NULL)";
+export function usageCounter(db) {
+  let ready;
+  const table = () => (ready ||= db.prepare(USAGE_SCHEMA).run().catch((e) => ((ready = null), Promise.reject(e))));
+  const dayOf = (now) => new Date(now).toISOString().slice(0, 10);
+  return {
+    async today(now = Date.now()) {
+      const day = dayOf(now);
+      if (db) {
+        try {
+          await table();
+          const row = await db.prepare("SELECT answers FROM ai_usage WHERE day = ?").bind(day).first();
+          return Math.max(row?.answers || 0, memoryCounts.get(day) || 0);
+        } catch {}
+      }
+      return memoryCounts.get(day) || 0;
+    },
+    async add(now = Date.now()) {
+      const day = dayOf(now);
+      memoryCounts.set(day, (memoryCounts.get(day) || 0) + 1);
+      if (!db) return;
+      try {
+        await table();
+        await db.prepare("INSERT INTO ai_usage (day, answers) VALUES (?, 1) ON CONFLICT(day) DO UPDATE SET answers = answers + 1").bind(day).run();
+        if (Math.random() < 0.05) await db.prepare("DELETE FROM ai_usage WHERE day < ?").bind(dayOf(now - 30 * 86400_000)).run();
+      } catch {}
+    },
+  };
+}
+
+// Returns { answer, readable, provider, model, budgetReached?, fallback? }. Throws when every provider
+// failed; the message keeps each provider's error, so a used-up allowance still reads as error 4006.
+export async function complete(env, { system, user }, { fetchImpl = fetch, now = Date.now(), usage = usageCounter(null) } = {}) {
+  const hasGroq = Boolean(env.GROQ_API_KEY);
+  const budget = dailyAnswerBudget(env);
+  const budgetReached = hasGroq && (await usage.today(now)) >= budget;
+  const viaWorkersAi = async () => {
+    const out = parseAnswer(await workersAi(env, system, user));
+    await usage.add(now);
+    return { ...out, provider: "workers-ai", model: WORKERS_AI_MODEL };
+  };
+  const viaGroq = async () => ({ ...parseAnswer(await groq(env, system, user, fetchImpl)), provider: "groq", model: env.GROQ_MODEL || GROQ_MODEL });
+  const order = !hasGroq ? [["Workers AI", viaWorkersAi]] : budgetReached ? [["Groq", viaGroq], ["Workers AI", viaWorkersAi]] : [["Workers AI", viaWorkersAi], ["Groq", viaGroq]];
+
   const errors = [];
-  if (skipWorkersAi(env, now)) {
-    errors.push("Workers AI: skipped, error 4006 (daily free allocation used up) seen recently");
-  } else {
+  let groqError;
+  for (const [name, run] of order) {
+    if (name === "Workers AI" && skipWorkersAi(env, now)) {
+      errors.push("Workers AI: skipped, error 4006 (daily free allocation used up) seen recently");
+      continue;
+    }
     try {
-      return { ...parseAnswer(await workersAi(env, system, user)), provider: "workers-ai", model: WORKERS_AI_MODEL };
+      const r = await run();
+      return { ...r, ...(budgetReached && { budgetReached: true }), ...(errors.length && { fallback: errors.join("; ") }) };
     } catch (e) {
-      if (isQuotaError(e)) markWorkersAiOut(now);
-      if (!env.GROQ_API_KEY) throw e;
-      errors.push(`Workers AI: ${e.message || e}`);
+      if (!hasGroq) throw e;
+      if (name === "Workers AI" && isQuotaError(e)) markWorkersAiOut(now);
+      if (name === "Groq") groqError = e;
+      errors.push(`${name}: ${e.message || e}`);
     }
   }
-  try {
-    const out = await groq(env, system, user, fetchImpl);
-    return { ...parseAnswer(out), provider: "groq", model: env.GROQ_MODEL || GROQ_MODEL, fallback: errors[0] };
-  } catch (e) {
-    // Both out of allowance: report it as the daily limit so the page says "try again later".
-    const both = e.status === 429 && errors.some(isQuotaError) ? " (daily free allocation used up on both providers)" : "";
-    throw new Error(`${errors.join("; ")}; Groq: ${e.message || e}${both}`);
-  }
+  // Both out of allowance: report it as the daily limit so the page says "try again later".
+  const both = groqError?.status === 429 && errors.some(isQuotaError) ? " (daily free allocation used up on both providers)" : "";
+  throw new Error(errors.join("; ") + both);
 }

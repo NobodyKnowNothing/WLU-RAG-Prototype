@@ -49,3 +49,11 @@ test("if the index fails, the live catalog path takes over and the failure is li
     globalThis.fetch = realFetch;
   }
 });
+
+test("full mode never settles for keyword-only index results when vector search fails", async () => {
+  const noVectors = { ...index, embed: async () => { throw new Error("4006: you have used up your daily free allocation"); } };
+  const quota = async () => { throw new Error("rerank: 4006: daily free allocation"); };
+  await assert.rejects(searchLaurier("penalty for plagiarism", opts({ question: "What is the penalty for plagiarism?", mode: "full", index: noVectors, rerank: quota })), /4006/);
+  const simple = await searchLaurier("first offence penalty", opts({ question: "What is the penalty for a first offence?", mode: "simple", index: noVectors, rerank: quota }));
+  assert.ok(simple.sources[0].viaIndex, "Simple mode is keyword search by design");
+});
