@@ -230,6 +230,10 @@ const deepLink = (url, s) => (s.anchor ? `${url}#${s.anchor}` : s.heading ? `${u
 const SEARCH_API = "https://wlu.ca/_ato/_common/search-overlay/php/search-api.php";
 const READABLE_HOSTS = /^https:\/\/(www\.|students\.|academic-calendar\.)?wlu\.ca\//;
 const FILE = /\.(pdf|docx?|xlsx?|pptx?)(\?|$)|qualtrics\.com/i;
+// News posts ("/news/2023/winter/fall-2022-official-grades-released.html") announce one term's
+// dates and stay searchable for years, so they are never read as sources: an old deadline in one
+// once outranked the Academic Calendar's rule for grade appeals.
+export const isNewsPost = (url) => /\/news\//i.test(new URL(url).pathname);
 const searches = new Map(); // query -> { at, results }
 
 export function parseSearchResults(html) {
@@ -352,7 +356,7 @@ async function fromSiteSearch(question, haveUrls, ctx) {
   const wantsFile = /\b(forms?|application|template|pdf|documents?|files?|rubrics?)\b/i.test(question);
   const links = wantsFile ? results.filter((r) => FILE.test(r.url)).slice(0, 3).map(({ title, url }) => ({ title, url })) : [];
   const extra = results
-    .filter((r) => !FILE.test(r.url) && !have.has(r.url.split("#")[0]))
+    .filter((r) => !FILE.test(r.url) && !isNewsPost(r.url) && !have.has(r.url.split("#")[0]))
     .slice(0, 2)
     .map((r) => CATALOG.find((p) => p.url === r.url) || { id: `search:${r.url}`, title: r.title, publisher: new URL(r.url).hostname.replace(/^www\./, ""), url: r.url, authority: authorityOf(r.url), revised: revisedOf(r.url) });
   return { loaded: await loadAll(extra, ctx, true), links };

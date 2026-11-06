@@ -189,7 +189,22 @@ Live Simple-mode retrieval on all 48 eval questions matched the pre-index run:
 
 Live MCP searches took 106–152 ms.
 
-A keyword search reads about 2,950 D1 rows and loading its candidates about 120 more, so D1's free 5M rows a day allows roughly 1,600 searches. Full-mode answers had to wait, because the day's Workers AI allowance was already used up.
+A keyword search reads about 2,950 D1 rows and loading its candidates about 120 more, so D1's free 5M rows a day allows roughly 1,600 searches.
+
+**Full mode, live (2026-11-06).** The Workers AI allowance was used up from before 23:56 UTC on 2026-11-05 until between 15:27 and 15:47 UTC the next day (`results/ai_budget_probes.jsonl`). Once it was back:
+- Full-mode retrieval on all 48 questions: Laurier page 21/21, PC141 section 23/23.
+- Answers to the 21 university-side questions, compared with the pre-index run (commit `6bb266d`):
+
+| | Before the index | With the index |
+|---|---|---|
+| Answer cites the right Laurier page | 19/20 | 20/21 |
+| Quotes that check out | 67/69 | 65/67 |
+| Not-found / partial | S2 / L6, L9 | S2 / L6, L9 (same causes) |
+| Median seconds per answer | 11.6 | 10.2 |
+
+The extra question, S4, had hit the daily limit in the earlier run. No question lost its citation or its status.
+
+One answer got worse in a way the checks don't catch. For L7 (grade appeals), site search found a 2023 news post, "Fall 2022 official grades released". The reranker scored it 0.996 against 0.998 for the Academic Calendar, so it took the third slot and its old deadline ("by Wednesday, March 8, 2023") appeared as a rule. News posts (`/news/` URLs) are no longer read as sources (version `c5410744`). L7 now cites only the calendar and the Petitions page, 7/7 quotes check out, and none of the 21 questions checks a news page.
 
 **Not tested:** the Docker image (Docker isn't installed here) and the GitHub Actions run.
 
