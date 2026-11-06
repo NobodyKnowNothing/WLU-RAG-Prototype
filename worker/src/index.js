@@ -1,8 +1,14 @@
 import chunks from "./chunks.json"; // built by scripts/export_chunks.py
 import vectors from "./vectors.json"; // precomputed by scripts/embed_chunks.py
+import { cloudflareAdapter } from "../../policy_index/src/cloudflare-adapter.mjs";
+import { search as searchPolicyIndex } from "../../policy_index/src/search.mjs";
+import { mcpHttp } from "../../policy_index/src/tool.mjs";
 import { RESPONSE_SCHEMA, SYSTEM_PROMPT, answerText, buildUserMessage, verifyAnswer } from "./answer.js";
 import { CATALOG, searchLaurier } from "./laurier.js";
 import { BM25, cosine, expandQuery, rrf } from "./retrieval.js";
+
+// The Laurier policy index (policy_index/), when its D1 database and Vectorize index are bound.
+const policyIndex = (env) => (env.POLICY_DB && env.POLICY_INDEX ? cloudflareAdapter({ db: env.POLICY_DB, vectorize: env.POLICY_INDEX, ai: env.AI }) : null);
 
 const EMBED_MODEL = "@cf/baai/bge-small-en-v1.5";
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
@@ -70,7 +76,7 @@ async function retrieve(env, ctx, { question, mode, scope, sections }) {
   const query = expandQuery([question, sections.lab && `PC141-${sections.lab}`, sections.tutorial && `PC141-${sections.tutorial}`].filter(Boolean).join(" "));
   const [course, laurier] = await Promise.all([
     scope === "laurier" ? [] : searchCourse(env, query, mode),
-    scope === "pc141" ? { sources: [], pages: [], links: [] } : searchLaurier(expandQuery(question), { question, mode, k: LAURIER_TOP_N, ctx, rerank: (q, t) => rerank(env, q, t), siteSearchOn: env.SITE_SEARCH !== "off" }),
+    scope === "pc141" ? { sources: [], pages: [], links: [] } : searchLaurier(expandQuery(question), { question, mode, k: LAURIER_TOP_N, ctx, rerank: (q, t) => rerank(env, q, t), siteSearchOn: env.SITE_SEARCH !== "off", index: policyIndex(env) }),
   ]);
   const sources = [...course.map((c) => ({ ...c, kind: "pc141" })), ...laurier.sources].map((s, i) => ({ n: i + 1, ...s }));
   return { sources, pages: laurier.pages, links: laurier.links || [] };
@@ -99,10 +105,10 @@ async function generate(env, question, sources, sections) {
   return out;
 }
 
-const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, authority, revised, viaSearch, fetchedAt, text, intro, score }) =>
+const publicSource = ({ n, kind, title, section, pages, source, pageId, url, publisher, authority, revised, viaSearch, viaIndex, fetchedAt, text, intro, score }) =>
   kind === "pc141"
     ? { n, kind, title, section, pages, file: source, text, ...(intro && { intro }), score }
-    : { n, kind, title, section, page: pageId, publisher, authority, ...(revised && { revised }), ...(viaSearch && { viaSearch }), url, fetchedAt, text, score };
+    : { n, kind, title, section, page: pageId, publisher, authority, ...(revised && { revised }), ...(viaSearch && { viaSearch }), ...(viaIndex && { viaIndex }), url, fetchedAt, text, score };
 
 async function ask(env, ctx, req) {
   const t0 = Date.now();
@@ -117,12 +123,14 @@ async function ask(env, ctx, req) {
   return { ...base, ...result, answer: answerText(result), timings: { retrieveMs: t1 - t0, generateMs: Date.now() - t1 } };
 }
 
-function meta() {
+async function meta(env) {
   const docs = new Map();
   for (const c of chunks) docs.set(c.source, { file: c.source, title: c.title, sections: (docs.get(c.source)?.sections || 0) + 1 });
+  const index = policyIndex(env);
   return {
     pc141: [...docs.values()],
     laurier: CATALOG.map(({ id, title, publisher, url, authority, revised }) => ({ id, title, publisher, url, authority, ...(revised && { revised }) })),
+    ...(index && { policyIndex: await index.stats().catch((e) => ({ error: String(e.message || e) })) }),
     sectionCodes: { lab: [...SECTION_CODES.lab].sort(), tutorial: [...SECTION_CODES.tutorial].sort() },
     modes: MODES,
     scopes: SCOPES,
@@ -160,7 +168,25 @@ export default {
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
     if (origin && !allowed.includes(origin)) return json({ error: "Origin not allowed" }, 403);
-    if (request.method === "GET" && new URL(request.url).pathname === "/meta") return json(meta());
+    const path = new URL(request.url).pathname;
+    if (request.method === "GET" && path === "/meta") return json(await meta(env));
+
+    // The policy index as tools for agents: MCP (stateless Streamable HTTP) and a plain search route.
+    // Neither calls the LLM; when the AI allowance is used up they fall back to keyword search.
+    const index = policyIndex(env);
+    try {
+      if (index && path === "/mcp") {
+        const r = await mcpHttp(index, request.method, request.method === "POST" ? await request.text() : "");
+        return new Response(r.body === null ? null : JSON.stringify(r.body), { status: r.status, headers: { ...cors, ...(r.headers || {}), ...(r.body !== null && { "Content-Type": "application/json" }) } });
+      }
+      if (index && path === "/policy-search" && request.method === "POST") {
+        const q = await request.json().catch(() => null);
+        if (typeof q?.query !== "string" || !q.query.trim() || q.query.length > 500) return json({ error: "query must be a non-empty string under 500 characters" }, 400);
+        return json(await searchPolicyIndex(index, q.query.trim(), { k: Math.max(1, Math.min(10, Number(q.k) || 5)), kinds: q.kinds }));
+      }
+    } catch (e) {
+      return json({ error: "Policy index error", detail: String(e.message || e) }, 502);
+    }
     if (request.method !== "POST") return json({ error: "POST a JSON body: {\"question\": \"...\"}, or GET /meta" }, 405);
 
     let body;

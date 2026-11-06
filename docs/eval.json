@@ -1,5 +1,5 @@
 {
- "date": "2026-11-05",
+ "date": "2026-11-06",
  "questions": 48,
  "summary": "19 questions from the original evaluation set, the 4 admin questions from the project plan, 10 questions on key student pages, 6 on other university policies, 4 that need Laurier's site search and 5 questions the sources cannot answer. Counts show how many questions each check applied to in that run.",
  "metrics": {
@@ -9,11 +9,11 @@
   },
   "Laurier page retrieved": {
    "simple": "21/21 (100%)",
-   "full": "20/20 (100%)"
+   "full": "21/21 (100%)"
   },
   "Gives an answer (answerable questions)": {
    "simple": "9/10 (90%)",
-   "full": "41/42 (98%)"
+   "full": "42/43 (98%)"
   },
   "Answer cites the right PC141 section": {
    "simple": "4/4 (100%)",
@@ -21,7 +21,7 @@
   },
   "Answer cites the right Laurier page": {
    "simple": "6/7 (86%)",
-   "full": "19/20 (95%)"
+   "full": "20/21 (95%)"
   },
   "Says it can't verify (unanswerable questions)": {
    "simple": "4/4 (100%)",
@@ -29,11 +29,11 @@
   },
   "Statements whose quote checks out": {
    "simple": "32/32 (100%)",
-   "full": "117/119 (98%)"
+   "full": "115/117 (98%)"
   },
   "Median seconds per answer": {
    "simple": 4.9,
-   "full": 10.3
+   "full": 9.2
   }
  }
 }

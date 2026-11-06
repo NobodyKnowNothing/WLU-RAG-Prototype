@@ -1,0 +1,23 @@
+// Policy search Worker. One-time setup (see policy_index/README.md):
+//   npx wrangler d1 create wlu-policies                      -> put the database_id below
+//   npx wrangler vectorize create wlu-policies --dimensions=384 --metric=cosine
+//   npx wrangler vectorize create-metadata-index wlu-policies --propertyName=kind --type=string
+//   node src/cli.mjs init --store cloudflare                 (creates the D1 tables)
+//   node src/cli.mjs sync --store cloudflare                 (first full build, ~6 minutes)
+//   npx wrangler deploy --config cloudflare/wrangler.jsonc
+{
+  "name": "wlu-policy-search",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "ai": { "binding": "AI" },
+  "d1_databases": [{ "binding": "DB", "database_name": "wlu-policies", "database_id": "22dbccee-a6be-44bf-a5f5-f43f3d758e11" }],
+  "vectorize": [{ "binding": "VECTORIZE", "index_name": "wlu-policies" }],
+  "vars": {
+    // Browser origins allowed to call the API (the PC141 site, local dev).
+    "ALLOWED_ORIGINS": "https://nobodyknownothing.github.io,http://localhost:8000,http://127.0.0.1:8000",
+    // "on" adds the bge-reranker-base cross-encoder. Off by default: on the eval questions hybrid
+    // retrieval alone did better (17/17 vs 14/17 expected page ranked first), and it saves neurons.
+    "RERANK": "off"
+  }
+  // For a private endpoint: npx wrangler secret put API_TOKEN (then send "Authorization: Bearer ...").
+}

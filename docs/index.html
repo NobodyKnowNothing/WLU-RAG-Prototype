@@ -112,7 +112,7 @@
 
   <details class="about" id="about">
     <summary>How it works and how accurate it is</summary>
-    <p><strong>Sources.</strong> PC141 course rules come from the course PDFs in the repository (syllabus, MyLearningSpace announcements, lab manual), split by section. University-wide information comes from official Laurier pages: key 2026/27 Undergraduate Academic Calendar and students.wlu.ca pages, every university policy and procedure in Laurier's policy register, and, when none of those fit, any other public page that Laurier's own site search finds. The assistant fetches those pages live from wlu.ca when a question needs them and keeps a copy for up to 6 hours. Each source is marked as a university policy, the Academic Calendar or a guidance page.</p>
+    <p><strong>Sources.</strong> PC141 course rules come from the course PDFs in the repository (syllabus, MyLearningSpace announcements, lab manual), split by section. University-wide information comes from official Laurier pages: key 2026/27 Undergraduate Academic Calendar and students.wlu.ca pages, every university policy and procedure in Laurier's policy register, and, when none of those fit, any other public page that Laurier's own site search finds. Policies, procedures and the key calendar and student pages are searched in an index of their sections, which is checked against wlu.ca every week; pages found by site search are fetched live and kept for up to 6 hours. Each source is marked as a university policy, the Academic Calendar or a guidance page.</p>
     <p><strong>Verification.</strong> The model must give each statement a source and an exact supporting quote. Statements with no valid source are removed. Statements whose quote isn't in the cited section, or that mention a number, time or email the section doesn't contain, are marked unverified.</p>
     <p><strong>Retrieval.</strong> <em>Simple</em> is keyword search (BM25). <em>Full</em> adds embeddings, fuses both with reciprocal rank fusion and reranks with a cross-encoder.</p>
     <div id="eval"><p class="muted">Loading evaluation results…</p></div>
@@ -206,7 +206,7 @@
     const empty = pc ? "No PC141 course rule found for this question." : "No university-wide policy found for this question.";
     return el("section", { className: `panel ${kind}` },
       el("h2", { textContent: pc ? "PC141 course rules" : "Laurier university-wide" }),
-      el("div", { className: "tag", textContent: pc ? "From the instructor's course documents" : "From official Laurier pages, fetched live from wlu.ca" }),
+      el("div", { className: "tag", textContent: pc ? "From the instructor's course documents" : "From official Laurier pages on wlu.ca" }),
       claims.length ? el("ul", {}, ...claims.map(claimItem)) : el("p", { className: "empty", textContent: empty })
     );
   }

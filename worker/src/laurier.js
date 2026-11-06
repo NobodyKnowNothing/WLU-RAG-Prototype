@@ -6,6 +6,9 @@
 //   2. Every university policy and procedure, from worker/src/policies.json (built from the
 //      wlu.ca sitemap by scripts/build_policy_index.mjs).
 //   3. Laurier's own site search, for any other public page on wlu.ca.
+// When the Worker has the policy index bound (policy_index/: D1 + Vectorize, re-checked weekly),
+// 1 and 2 are searched there section by section instead of being routed and fetched live.
+import { search as searchIndex } from "../../policy_index/src/search.mjs";
 import { decodeEntities, htmlToSections, pageArea } from "./html.js";
 import policies from "./policies.json" with { type: "json" };
 import { BM25, tokenize } from "./retrieval.js";
@@ -227,6 +230,10 @@ const deepLink = (url, s) => (s.anchor ? `${url}#${s.anchor}` : s.heading ? `${u
 const SEARCH_API = "https://wlu.ca/_ato/_common/search-overlay/php/search-api.php";
 const READABLE_HOSTS = /^https:\/\/(www\.|students\.|academic-calendar\.)?wlu\.ca\//;
 const FILE = /\.(pdf|docx?|xlsx?|pptx?)(\?|$)|qualtrics\.com/i;
+// News posts ("/news/2023/winter/fall-2022-official-grades-released.html") announce one term's
+// dates and stay searchable for years, so they are never read as sources: an old deadline in one
+// once outranked the Academic Calendar's rule for grade appeals.
+export const isNewsPost = (url) => /\/news\//i.test(new URL(url).pathname);
 const searches = new Map(); // query -> { at, results }
 
 export function parseSearchResults(html) {
@@ -257,33 +264,71 @@ async function siteSearch(question) {
   return results;
 }
 
+const attempt = (p) => p.catch((e) => ({ loaded: [], links: [], error: String(e.message || e) }));
+const INDEX_POOL = { simple: 6, full: 10 };
+const INDEXED = new Set(CATALOG.map((p) => p.url)); // the policy index holds every catalog page
+
+// An indexed section in the shape rankSections and the source list use. Its link and clause range
+// come from the index ("4.04 Penalties for Academic Misconduct (4.04.01)").
+function fromIndex(h) {
+  const path = h.section.split(" > ");
+  return {
+    s: { path, heading: path.at(-1), anchor: "", text: h.text, url: h.url, clauses: h.clauses && !path.at(-1).startsWith(`${h.clauses} `) ? h.clauses : "" },
+    entry: { id: h.page_id, title: h.title, publisher: h.publisher, url: h.page_url, authority: h.authority, revised: h.revised || undefined },
+    page: { fetchedAt: h.fetched_at },
+    viaIndex: true,
+    score: h.score,
+  };
+}
+
 // Returns { sources, pages, links }: the best sections (as citable sources), which pages were
 // checked, and files or forms the site search found but that can't be read and quoted.
-export async function searchLaurier(query, { question = query, mode, k, ctx, rerank, siteSearchOn = true }) {
+export async function searchLaurier(query, { question = query, mode, k, ctx, rerank, siteSearchOn = true, index = null }) {
+  let indexError;
+  if (index) {
+    // The index search gets the student's question: it adds the synonyms itself. Simple mode stays
+    // keyword-only; Full adds vector search. If the index is down, fall back to live pages.
+    // Site search runs alongside and skips only the pages the index search returned: it can still
+    // bring in an indexed page the index ranked lower (as it did for pages the router didn't pick).
+    const indexed = searchIndex(index, question, { k: INDEX_POOL[mode] || INDEX_POOL.full, dense: mode !== "simple", rerank: false }).catch((e) => ((indexError = String(e.message || e)), null));
+    // Simple mode uses the first k - 1 index hits (one slot is kept for site search); Full mode
+    // reranks all of them.
+    const used = mode === "simple" ? k - 1 : Infinity;
+    const returned = indexed.then((f) => new Set(f ? f.results.slice(0, used).map((h) => h.page_url) : INDEXED));
+    const [found, search] = await Promise.all([indexed, siteSearchOn ? attempt(fromSiteSearch(question, returned, ctx)) : null]);
+    if (found) {
+      const hits = found.results.map(fromIndex);
+      const indexPages = [...new Map(hits.map(({ entry, page }) => [entry.id, { entry, page, viaIndex: true }])).values()];
+      return answerSources([...hits, ...sectionsOf(search?.loaded || [])], [...indexPages, ...(search?.loaded || [])], search, query, mode, k, rerank);
+    }
+  }
   const entries = await routePages(query, mode, rerank);
   // Keyword overlap can't tell a page that answers the question from one that merely mentions its
   // words ("order a transcript" vs the policy on what a transcript contains), so Laurier's own
   // search runs alongside the catalog and the section ranking below picks from both.
   const have = new Set(entries.map((e) => e.url));
-  const attempt = (p) => p.catch((e) => ({ loaded: [], links: [], error: String(e.message || e) }));
   const [catalogPages, search] = await Promise.all([loadAll(entries, ctx), siteSearchOn ? attempt(fromSiteSearch(question, have, ctx)) : null]);
   const loaded = [...catalogPages, ...(search?.loaded || [])];
-  const { secs, ranked } = await rankSections(loaded, query, mode, k, rerank);
-  const links = search?.links || [];
-  const searchError = search?.error;
+  const out = await answerSources(sectionsOf(loaded), loaded, search, query, mode, k, rerank);
+  if (indexError) out.pages.push({ id: "policy-index", title: "Laurier policy index", url: "", error: indexError });
+  return out;
+}
 
-  const pages = loaded.map(({ entry, page, error, viaSearch }) => ({
+async function answerSources(allSecs, loaded, search, query, mode, k, rerank) {
+  const { secs, ranked } = await rankSections(allSecs, query, mode, k, rerank);
+  const pages = loaded.map(({ entry, page, error, viaSearch, viaIndex }) => ({
     id: entry.id,
     title: entry.title,
     publisher: publisherOf(entry, page),
     url: entry.url,
     authority: entry.authority,
     ...(viaSearch && { viaSearch }),
-    ...(page ? { fetchedAt: page.fetchedAt, sections: page.sections.length } : { error }),
+    ...(viaIndex && { viaIndex }),
+    ...(page ? { fetchedAt: page.fetchedAt, ...(page.sections && { sections: page.sections.length }) } : { error }),
   }));
-  if (searchError) pages.push({ id: "site-search", title: "Laurier site search", url: "https://www.wlu.ca/search.html", error: searchError });
+  if (search?.error) pages.push({ id: "site-search", title: "Laurier site search", url: "https://www.wlu.ca/search.html", error: search.error });
   const sources = ranked.map(({ i, score }) => {
-    const { s, entry, page, viaSearch } = secs[i];
+    const { s, entry, page, viaSearch, viaIndex } = secs[i];
     return {
       kind: "laurier",
       pageId: entry.id,
@@ -292,24 +337,26 @@ export async function searchLaurier(query, { question = query, mode, k, ctx, rer
       authority: entry.authority,
       ...(entry.revised && { revised: entry.revised }),
       ...(viaSearch && { viaSearch }),
-      section: s.path.join(" > "),
-      url: deepLink(entry.url, s),
+      ...(viaIndex && { viaIndex }),
+      section: s.path.join(" > ") + (s.clauses ? ` (${s.clauses})` : ""),
+      url: s.url || deepLink(entry.url, s),
       fetchedAt: page.fetchedAt,
       text: s.text,
       score,
     };
   });
-  return { sources, pages, links };
+  return { sources, pages, links: search?.links || [] };
 }
 
 // Reads the top two web pages the site search finds (that aren't already loaded) and lists the
 // files and forms it finds as links, since those can't be read and quoted.
-async function fromSiteSearch(question, have, ctx) {
+async function fromSiteSearch(question, haveUrls, ctx) {
   const results = (await siteSearch(question)).filter((r) => READABLE_HOSTS.test(r.url) || FILE.test(r.url));
+  const have = await haveUrls; // a Set, or a promise of one
   const wantsFile = /\b(forms?|application|template|pdf|documents?|files?|rubrics?)\b/i.test(question);
   const links = wantsFile ? results.filter((r) => FILE.test(r.url)).slice(0, 3).map(({ title, url }) => ({ title, url })) : [];
   const extra = results
-    .filter((r) => !FILE.test(r.url) && !have.has(r.url.split("#")[0]))
+    .filter((r) => !FILE.test(r.url) && !isNewsPost(r.url) && !have.has(r.url.split("#")[0]))
     .slice(0, 2)
     .map((r) => CATALOG.find((p) => p.url === r.url) || { id: `search:${r.url}`, title: r.title, publisher: new URL(r.url).hostname.replace(/^www\./, ""), url: r.url, authority: authorityOf(r.url), revised: revisedOf(r.url) });
   return { loaded: await loadAll(extra, ctx, true), links };
@@ -325,15 +372,18 @@ const loadAll = (entries, ctx, viaSearch = false) =>
     )
   );
 
-async function rankSections(loaded, query, mode, k, rerank) {
-  const secs = loaded.flatMap(({ entry, page, viaSearch }) => (page ? page.sections.map((s) => ({ s, entry, page, viaSearch })) : []));
+const sectionsOf = (loaded) => loaded.flatMap(({ entry, page, viaSearch }) => (page ? page.sections.map((s) => ({ s, entry, page, viaSearch })) : []));
+
+async function rankSections(secs, query, mode, k, rerank) {
   if (!secs.length) return { secs, ranked: [] };
   const docText = ({ s, entry }) => `${entry.title} | ${s.path.join(" > ")}\n${s.text}`;
   const lexical = new BM25(secs.map(docText)).rank(query);
   if (mode === "simple") {
     // Keyword scores aren't comparable across unrelated pages (a co-op page that repeats "code of
     // conduct" can outscore the policy itself), so site search results get one slot, not all.
-    const catalog = lexical.filter(([i]) => !secs[i].viaSearch);
+    // Indexed sections keep the order the index ranked them in (BM25 over the whole index).
+    const indexed = secs.flatMap((x, i) => (x.viaIndex ? [[i, x.score]] : []));
+    const catalog = indexed.length ? indexed : lexical.filter(([i]) => !secs[i].viaSearch);
     const web = lexical.filter(([i]) => secs[i].viaSearch);
     const picked = [...catalog.slice(0, k - Math.min(1, web.length)), ...web].slice(0, k);
     return { secs, ranked: picked.map(([i, score]) => ({ i, score })) };

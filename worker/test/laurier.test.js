@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { buildUserMessage } from "../src/answer.js";
-import { CATALOG, PAGES, authorityOf, parseSearchResults, publisherOf } from "../src/laurier.js";
+import { CATALOG, PAGES, authorityOf, isNewsPost, parseSearchResults, publisherOf } from "../src/laurier.js";
 
 test("site search results are parsed from the endpoint's HTML", () => {
   const html = `<li class="search-result">
@@ -23,6 +23,13 @@ test("pages found by site search are named after their site area", () => {
   assert.equal(publisherOf(found, { area: "Accessible Learning" }), "Laurier Students: Accessible Learning");
   assert.equal(publisherOf(found, { area: "" }), "students.wlu.ca");
   assert.equal(publisherOf(PAGES[0], { area: "Something" }), PAGES[0].publisher);
+});
+
+test("dated news posts found by site search are not read as sources", () => {
+  assert.equal(isNewsPost("https://students.wlu.ca/academics/records-and-registration/news/2023/winter/fall-2022-official-grades-released.html"), true);
+  assert.equal(isNewsPost("https://www.wlu.ca/news/news-releases/2026/oct/x.html"), true);
+  assert.equal(isNewsPost("https://students.wlu.ca/academics/records-and-registration/student-records/index.html"), false);
+  assert.equal(isNewsPost("https://students.wlu.ca/campus-life/newsletters.html"), false);
 });
 
 test("sources are ranked by authority: policies and the calendar are rules, the rest is guidance", () => {
