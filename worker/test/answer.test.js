@@ -16,6 +16,13 @@ test("quotes match despite PDF spacing, dashes and ellipses", () => {
   assert.ok(!quoteFound("", [SOURCES[0].text]));
 });
 
+test("multi-sentence quotes match sentence by sentence, across list numbers and in any order", () => {
+  const src = "16. Tutorial grades will be posted on MyLearningSpace (MyLS).\n17. The final tutorial grade will be determined out of 100%.\nMake-ups require a note. Make-ups are arranged within one week.";
+  assert.ok(quoteFound("Tutorial grades will be posted on MyLearningSpace (MyLS). The final tutorial grade will be determined out of 100%.", [src]));
+  assert.ok(quoteFound("Make‑ups are arranged within one week. Make‑ups require a note.", [src]));
+  assert.ok(!quoteFound("Tutorial grades will be posted on MyLearningSpace (MyLS). The final grade is out of 90%.", [src]), "every sentence must be verbatim");
+});
+
 test("verified claims keep their bucket and the answer counts as answered", () => {
   const v = verifyAnswer(
     {

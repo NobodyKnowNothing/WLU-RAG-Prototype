@@ -1,5 +1,5 @@
-// Answer generation: Llama 3.3 70B on Workers AI, and the same model on Groq (when the GROQ_API_KEY
-// secret is set). Workers AI's daily allowance is shared with retrieval (query embeddings and the
+// Answer generation: Llama 3.3 70B on Workers AI, and GPT-OSS 120B on Groq (when the GROQ_API_KEY
+// secret is set; Groq's Llama 3.3 70B is no longer open to regular accounts). Workers AI's daily allowance is shared with retrieval (query embeddings and the
 // reranker), and Llama uses about 120 neurons an answer against a fraction of a neuron for a
 // retrieval. So Workers AI writes only the first WORKERS_AI_DAILY_ANSWERS answers of each UTC day,
 // then Groq takes over, and the rest of the allowance keeps vector retrieval running. Either
@@ -7,7 +7,7 @@
 import { RESPONSE_SCHEMA } from "./answer.js";
 
 export const WORKERS_AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
-export const GROQ_MODEL = "llama-3.3-70b-versatile";
+export const GROQ_MODEL = "openai/gpt-oss-120b";
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_TIMEOUT_MS = 45_000;
 const TEMPERATURE = 0.1;
@@ -26,8 +26,33 @@ export const resetWorkersAiState = () => (workersAiOutUntil = 0);
 // True when Workers AI should be skipped: it ran out recently and there is a backup to use instead.
 export const skipWorkersAi = (env, now = Date.now()) => Boolean(env.GROQ_API_KEY) && now < workersAiOutUntil;
 
-// Groq's Llama 3.3 supports JSON mode but not schema-constrained output, so the schema is spelled
-// out in the prompt. verifyAnswer still checks every field of whatever comes back.
+// Groq models with strict structured outputs get the answer schema as a constraint; others get JSON
+// mode only. Both get the schema spelled out in the prompt, and verifyAnswer checks every field.
+const STRICT_SCHEMA_MODELS = /^(openai\/gpt-oss-|qwen\/qwen3|meta-models\/muse-spark)/;
+// Reasoning models spend completion tokens on hidden reasoning before the answer, so they get a
+// low effort and a larger token allowance (an answer cut off mid-JSON is unreadable).
+const REASONING_MODELS = /^(openai\/gpt-oss-|qwen\/qwen3)/;
+const REASONING_MAX_TOKENS = 4096;
+// Strict mode needs additionalProperties: false on every object.
+const strict = (schema) =>
+  schema && typeof schema === "object"
+    ? Object.fromEntries([...Object.entries(schema).map(([k, v]) => [k, typeof v === "object" ? (Array.isArray(v) ? v.map(strict) : strict(v)) : v]), ...(schema.type === "object" ? [["additionalProperties", false]] : [])])
+    : schema;
+export function groqRequest(model, system, user) {
+  const reasoning = REASONING_MODELS.test(model);
+  return {
+    model,
+    messages: [
+      { role: "system", content: system + JSON_INSTRUCTIONS },
+      { role: "user", content: user },
+    ],
+    response_format: STRICT_SCHEMA_MODELS.test(model) ? { type: "json_schema", json_schema: { name: "answer", strict: true, schema: strict(RESPONSE_SCHEMA) } } : { type: "json_object" },
+    temperature: TEMPERATURE,
+    max_tokens: reasoning ? REASONING_MAX_TOKENS : MAX_TOKENS,
+    ...(model.startsWith("openai/gpt-oss-") && { reasoning_effort: "low" }),
+  };
+}
+
 const JSON_INSTRUCTIONS = `
 
 Reply with one JSON object and nothing else. It has exactly these keys: "status" (one of "answered", "partial", "not_found"), "pc141" and "laurier" (arrays of claim objects, each {"text": string, "quote": string, "sources": array of source numbers}), and "unverified" (a string, empty when there is nothing to report).`;
@@ -58,33 +83,31 @@ async function workersAi(env, system, user) {
   return res.response ?? res.choices?.[0]?.message?.content;
 }
 
+// A secret piped in from a Windows shell can carry a byte-order mark or a trailing CR/LF, which makes
+// the Authorization header invalid (an empty 400 before the request reaches Groq). Keys are plain ASCII.
+export const cleanKey = (key) => String(key || "").replace(/[^\x21-\x7e]/g, "");
+
 async function groq(env, system, user, fetchImpl = fetch) {
+  const key = cleanKey(env.GROQ_API_KEY);
   const call = async () => {
     const res = await fetchImpl(GROQ_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: env.GROQ_MODEL || GROQ_MODEL,
-        messages: [
-          { role: "system", content: system + JSON_INSTRUCTIONS },
-          { role: "user", content: user },
-        ],
-        response_format: { type: "json_object" },
-        temperature: TEMPERATURE,
-        max_tokens: MAX_TOKENS,
-      }),
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "User-Agent": "wlu-rag-api/1.0" },
+      body: JSON.stringify(groqRequest(env.GROQ_MODEL || GROQ_MODEL, system, user)),
       signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
     });
     if (!res.ok) {
-      const err = new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      const body = (await res.text()).slice(0, 300);
+      const ray = res.headers.get("cf-ray");
+      const err = new Error(`HTTP ${res.status}: ${body || `(empty body${ray ? `, cf-ray ${ray}` : ""}${String(env.GROQ_API_KEY).length !== key.length ? ", key had stray characters removed" : ""})`}`);
       err.status = res.status;
       throw err;
     }
     const data = await res.json();
     return data.choices?.[0]?.message?.content;
   };
-  // Retry once, except when Groq says its limit is reached.
-  return call().catch((e) => (e.status === 429 ? Promise.reject(e) : call()));
+  // Retry once for network errors and 5xx; a 4xx (bad key, unknown model, limit reached) won't change.
+  return call().catch((e) => (e.status && e.status < 500 ? Promise.reject(e) : call()));
 }
 
 export const DEFAULT_DAILY_ANSWERS = 25; // the allowance has run out after as few as 41 answers
