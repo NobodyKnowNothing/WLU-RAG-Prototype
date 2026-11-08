@@ -85,9 +85,12 @@ function factsIn(text) {
 // stop a quote from matching its source.
 const squash = (s) => s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9@]+/g, "");
 
-// True when every part of the quote ("..." separates parts) appears word for word in one of the texts.
+// True when every part of the quote appears word for word in one of the texts. Parts are split at
+// "..." and at sentence ends, so a quote that joins two sentences of a numbered list (dropping the
+// "17." between them) or gives them in another order still counts, while every sentence must
+// still be verbatim.
 export function quoteFound(quote, texts) {
-  const parts = String(quote || "").split(/\.\.\.|…/).map(squash).filter((p) => p.length >= 8);
+  const parts = String(quote || "").split(/\.\.\.|…|(?<=[.!?;])\s+/).map(squash).filter((p) => p.length >= 8);
   const hay = texts.map(squash);
   return parts.length > 0 && parts.every((p) => hay.some((h) => h.includes(p)));
 }

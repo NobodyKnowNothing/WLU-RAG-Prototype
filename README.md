@@ -1,164 +1,209 @@
-# WLU RAG Prototype
+# PC141 Course Assistant (WLU RAG Prototype)
 
-Question answering with citations over the PC141 course PDFs in `files/`.
+A question-answering assistant for students in **PC141 at Wilfrid Laurier University**. It answers administrative questions, such as "When is my lab?", "What do I do if I miss it?", "Where do I submit?" or "What is the penalty for a first plagiarism offence?". Every statement in an answer cites the section it came from, quotes it, and is checked against that quote.
 
-**Pipeline:**
+- **Site:** <https://nobodyknownothing.github.io/WLU-RAG-Prototype/>
+- **API:** `https://wlu-rag-api.nobodyknownothing.workers.dev`
 
-1. Split each PDF page into chunks.
-2. Gemma (`gemma-4-31b-it`, with `gemma-4-26b-a4b-it` as fallback) writes a short description of each chunk.
-3. Index the chunks for search: embeddings (MiniLM) in Qdrant, plus BM25 keyword search.
-4. Merge both result lists with reciprocal rank fusion (RRF), then rerank them with a cross-encoder and keep the top 5.
-5. Gemma answers from those 5 chunks and cites them as `[Cite: file, Page: n]`.
+The project started as a Python RAG notebook over four course PDFs. It is now three things:
 
-## Setup
+1. **A deployed web assistant.** A static page on GitHub Pages calls a Cloudflare Worker. The Worker answers from the PC141 documents and from official Laurier sources, and keeps the two apart.
+2. **A Laurier policy index.** Every university policy and procedure, plus key Academic Calendar and student pages (183 pages, 2,390 sections), is kept in D1 + Vectorize and re-checked against wlu.ca every week. The Worker uses it for answers, and agents can search it over MCP or HTTP.
+3. **The original Python prototype.** It still works as a command-line tool (Gemma via the Gemini API, Qdrant, BM25), but the web assistant no longer uses it.
 
-Requires Python 3.10+ (tested on 3.12).
+## Repository layout
+
+| Path | What it is |
+|---|---|
+| [`docs/`](docs/) | The frontend: a single `index.html`, deployed to GitHub Pages by `.github/workflows/pages.yml` |
+| [`worker/`](worker/) | The Cloudflare Worker API (`wlu-rag-api`): retrieval, Laurier sources, answer generation and verification, answer cache, MCP endpoint |
+| [`policy_index/`](policy_index/) | The Laurier policy index: crawler, section chunker, weekly sync, hybrid search, MCP/HTTP server. See [its README](policy_index/README.md) and [HOSTING.md](policy_index/HOSTING.md) |
+| [`scripts/`](scripts/) | Build and evaluation scripts for the Worker (chunk export, embeddings, policy list, eval runner, AI-allowance probe) |
+| [`rag_prototype/`](rag_prototype/) | The original Python RAG CLI |
+| [`files/`](files/) | The PC141 source PDFs: lab syllabus, lab manual, lab rules, tutorial rules |
+| [`data/`](data/) | Evaluation questions: `eval_questions.json` (19, Python CLI) and `web_eval.json` (48, web assistant) |
+| [`results/`](results/) | Recorded evaluation runs |
+| `.rag_cache/` | The Python prototype's committed index, so a fresh clone can answer without re-tagging |
+
+## How an answer is produced
+
+```
+question ──► retrieve PC141 sections ──┐
+         └─► retrieve Laurier sources ─┴─► LLM writes JSON answer ──► verifier ──► two cited lists
+              policy index (D1 + Vectorize)        Workers AI or Groq     quotes,      "PC141 course rules"
+              + live wlu.ca site search            (Llama 3.3 / GPT-OSS)  numbers,     "Laurier university-wide"
+                                                                          emails
+```
+
+### Sources
+
+- **PC141 documents.** `scripts/export_chunks.py` splits the PDFs in `files/` by section into `worker/src/chunks.json` (63 sections). Headings are detected from PDF fonts: whole-line bold text, numbered headings like "3.2 Bounding", and MyLearningSpace posts. Citations read like *PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy, p. 4*. Students can pick their lab and tutorial section (e.g. L04, T02), so answers about times and rooms use their section.
+- **Laurier policy index.** The 167 governance pages listed in the wlu.ca sitemap, plus 16 hand-picked pages (2026/27 Undergraduate Academic Calendar sections and dates; students.wlu.ca pages on academic integrity, Gen AI, deferred exams, absences, petitions and Accessible Learning). They are split into sections, with long sections split by clause, so a citation can point to *12.2 Student Code of Conduct: Academic Misconduct > 4.04 Penalties for Academic Misconduct, 4.04.01* and link straight to it.
+- **Laurier site search.** For anything outside the index, such as transcripts, parking or the OneCard, the Worker queries the endpoint behind wlu.ca's search box and fetches the pages live, caching each for 6 hours. It isn't a published API, so the Worker sends one request per question; set `SITE_SEARCH` to `"off"` in `worker/wrangler.jsonc` to disable it. News posts are skipped. PDF, Word and Qualtrics forms are listed as links when the question asks for a form, but are not quoted.
+
+Each Laurier source is labelled as a *university policy* (with its revision date), the *Academic Calendar* or a *guidance page*. When they disagree, the policy or calendar comes first. Campus tabs (Waterloo, Brantford, Kitchener, Milton) stay in the section name, and the model must say when a rule only covers one campus, faculty or group of students.
+
+### Retrieval modes
+
+- **Simple:** BM25 keyword search only.
+- **Full** (the default): keyword search plus `bge-small-en-v1.5` embeddings, fused with reciprocal rank fusion and reranked with `bge-reranker-base`.
+
+Both modes add a few student-to-document synonyms (e.g. ChatGPT → "AI-based systems"), ignore "Laurier"/"WLU"/"Wilfrid" as search terms, and also search for definitions when a question asks what something "counts as" or "means".
+
+### Answers and verification
+
+The model returns JSON with two lists, *PC141 course rules* and *Laurier university-wide*. Each statement goes in the list that matches the source it cites, so a university policy is never presented as a course rule. Then `worker/src/answer.js` checks every statement:
+
+- Statements with no valid source are removed.
+- Statements whose quote isn't in the cited section, or that mention a number, time or email the section doesn't contain, are marked **unverified**.
+- If nothing is supported, the answer is "Couldn't verify an answer".
+- When sources disagree, both versions are reported.
+
+The quote check confirms the wording exists in the source. It can't catch every overstatement, so the page shows each statement's quote for students to compare.
+
+### Models, daily limits and caching
+
+Everything runs on free tiers, and the binding limit is the **Workers AI daily allowance** (10,000 neurons, shared by every model and every user). Llama 3.3 70B spends about 120 neurons per answer; an embedding or rerank costs a fraction of one. In practice the allowance has run out after 40 to 50 answers, and not always at the documented 00:00 UTC reset.
+
+So the Worker (`worker/src/llm.js`) splits the work:
+
+- **Workers AI** (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`) writes the first `WORKERS_AI_DAILY_ANSWERS` answers of each UTC day (default 25, counted in the D1 table `ai_usage`).
+- **Groq** (`openai/gpt-oss-120b`, or the `GROQ_MODEL` var) writes the rest, which leaves the remaining allowance for embeddings and reranking. Groq's `llama-3.3-70b-versatile` is no longer open to regular accounts (its limits say "Contact Sales", and requests get 404 `model_not_found`). GPT-OSS is a reasoning model, so it runs with `reasoning_effort: "low"` and a 4,096-token allowance. On the live Worker it answered in about 1.7 s. How many answers a day Groq covers depends on its free-tier token limits.
+- Each provider backs up the other: Workers AI answers when Groq is rate-limited, and Workers AI error 4006 sends the answer to Groq. Full mode never quietly drops to keyword-only retrieval. If Workers AI is out entirely, the Worker returns 429 and the page asks students to try again later.
+- GPT-OSS on Groq gets the answer schema as a strict structured output; a `GROQ_MODEL` without strict support gets JSON mode with the schema in the prompt. The verifier checks the result as usual. Quotes are checked sentence by sentence, so a quote that skips a list number between two sentences, or gives them in another order, still matches, while every sentence must be verbatim. Each response's `llm` field names the provider (`budgetReached: true` when the budget sent it to Groq).
+
+**Answer cache** (`worker/src/cache.js`): answers are kept for 24 hours in the D1 table `answer_cache`, with a small in-memory copy per isolate. The key is the normalised question (case, spacing and trailing punctuation ignored), mode, scope and sections. A repeat question costs no model calls, and identical questions asked at the same moment share one answer. Answers built while a Laurier page was unavailable are kept for only 2 hours. Bump `CACHE_VERSION` when retrieval or the prompt changes.
+
+## API
+
+`POST /` with a JSON body:
+
+```json
+{
+  "question": "What do I do if I miss my lab?",
+  "mode": "full",
+  "scope": "both",
+  "sections": { "lab": "L04", "tutorial": "T02" },
+  "retrieveOnly": false,
+  "cache": true
+}
+```
+
+- `mode`: `"simple"` or `"full"` (default).
+- `scope`: `"both"` (default), `"pc141"` or `"laurier"`.
+- `retrieveOnly: true` returns the retrieved sources without calling the LLM. These requests are never cached.
+- `cache: false` skips the cached answer; a fresh one is still stored.
+- Cached responses carry `cached: true` and `cachedAt`.
+
+Other routes:
+
+- `GET /meta`: the PC141 documents, Laurier catalog, policy-index stats and valid section codes.
+- `POST /mcp`: MCP (stateless Streamable HTTP) with the tools `search_policies`, `get_policy_section` and `list_policies`.
+- `POST /policy-search {"query", "k", "kinds"}`: plain HTTP search of the policy index.
+
+The policy-index routes make no LLM calls, and fall back to keyword search when the AI allowance is used up. Browser requests are only accepted from `ALLOWED_ORIGIN` (the Pages site) and `localhost:8000`.
+
+To use the policy index from Claude Code:
 
 ```bash
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
+claude mcp add --transport http wlu-policies https://wlu-rag-api.nobodyknownothing.workers.dev/mcp
 ```
-
-On macOS/Linux, use `.venv/bin/pip` instead. Then create a `.env` file containing your Gemini API key:
-
-```
-GEMINI_API_KEY=your-key
-```
-
-## Usage
-
-```bash
-python -m rag_prototype run                                  # index + demo question + eval
-python -m rag_prototype index                                # index new/changed PDFs in files/
-python -m rag_prototype ask "Can I use my phone in the lab?" --show-sources
-python -m rag_prototype eval                                 # writes results/eval_results.json
-```
-
-## Caching
-
-The index is committed in `.rag_cache/`, so a fresh clone can answer questions straight away without re-tagging the PDFs:
-
-- Each PDF is identified by its SHA-256 hash. Unchanged PDFs are skipped, edited ones are re-processed, and deleted ones are removed from the index.
-- Gemma descriptions are saved after every call (`tags.json`), so an interrupted index run resumes where it stopped.
-- If the vector store is lost, it is rebuilt from the cached chunks without calling Gemma.
-- Changing the chunking, embedding model, Gemma model or tagging prompt in `rag_prototype/config.py` triggers a full rebuild. Cached descriptions are still reused where possible.
-
-To rebuild from scratch, delete `.rag_cache/`.
 
 ## Results
 
-These are from indexing 4 PDFs (36 pages) into 36 chunks. Results are in `results/eval_results.json`.
-
-| Metric | Result |
-|---|---|
-| Correct PDF in the top 5 results | **19/19** questions |
-| First index run, from empty cache | ~5 min |
-| Re-index with no changes | ~3 s, no Gemma calls |
-
-Every answer cites its source, and the 19 answers agree with the expected answer locations. Two answers (Q10, Q14) also mention the matching lab or tutorial rule from the other PDF.
-
-**Caveats:**
-
-- Cited page numbers are PDF page positions, not the numbers printed on the page. For example, "Page 2" in the printed lab manual is PDF page 6.
-- Gemma 4 calls take 20–70 s each and sometimes fail with 500/503 errors. The client fails over to the other model and retries.
-- Gemma's thinking is set to minimal. With the default setting, its hidden reasoning used up the reply's token limit and answers came back empty or cut off.
-
-## Web demo: PC141 admin assistant
-
-A static frontend in `docs/` is deployed to GitHub Pages by `.github/workflows/pages.yml`. It calls a Cloudflare Worker in `worker/` that runs on Workers AI (`bge-small` embeddings, `bge-reranker-base`, Llama 3.3 70B), with Llama 3.3 70B on Groq as a backup (below). It answers admin questions such as "When is my lab?", "What do I do if I miss it?", "Where do I submit?" and "What are the plagiarism rules?".
-
-- **PC141 documents (phase one).** `scripts/export_chunks.py` splits the PDFs in `files/` by section. Headings are detected from the PDF fonts: whole-line bold text, numbered headings such as "3.2 Bounding", and MyLearningSpace posts. Each chunk keeps its document title, section path and pages, so answers cite e.g. *PC141 Lab Syllabus (Fall 2026) > Requirements and Policies > Plagiarism Policy, p. 4*.
-- **Official Laurier pages (phase two).** University-wide answers come from three places (`worker/src/laurier.js`). The first two are now read from the policy index (see below): every section of those pages is kept in D1 and Vectorize and re-checked against wlu.ca weekly. Site search results are still fetched live and kept for up to 6 hours. Before the index, all three were fetched live:
-  - 16 hand-picked student pages: the 2026/27 Undergraduate Academic Calendar (examinations, grades, add/drop, petitions, student regulations, fall and winter dates) and students.wlu.ca pages on academic integrity, Gen AI, deferred exams, absences, petitions and Accessible Learning.
-  - Every university policy and procedure, 169 in all, listed in `worker/src/policies.json`. `scripts/build_policy_index.mjs` builds that list from the wlu.ca sitemap, which lists the whole policy register under `/about/governance/assets/resources/`. It records each policy's title, number, approval and revision dates, office and purpose, and re-reads only pages whose sitemap date changed.
-  - Laurier's own site search (the endpoint behind wlu.ca's search box) for any other public page, such as transcripts, parking or the OneCard. It is not a published API, so the Worker sends one request per question and caches results; setting `SITE_SEARCH` to `"off"` in `wrangler.jsonc` turns it off. PDFs, Word files and Qualtrics forms it finds are listed as links when the question asks for a form, but not quoted.
-
-  The Worker splits pages into sections (`worker/src/html.js`) and cites the section with a link to it. Campus tabs (Waterloo, Brantford, Kitchener, Milton) stay in the section name, so a Brantford rule is cited as *Brantford > …*. Pages found by site search are labelled with their part of the site (e.g. *Laurier Students: Accessible Learning*), and the model must say when a rule only covers one campus, faculty or group of students. Each source is marked as a *university policy* (with its last revision date), the *Academic Calendar* or a *guidance page*. When they disagree, the policy or calendar version comes first.
-- **Course rules and university rules are kept apart.** Answers come back as two lists, *PC141 course rules* and *Laurier university-wide*. Each statement goes in the list that matches the kind of source it cites, so a university policy is never shown as a course rule.
-- **Says so instead of guessing.** Each statement must give its sources and an exact supporting quote (`worker/src/answer.js`):
-  - Statements with no valid source are removed.
-  - Statements whose quote isn't in the cited section, or that mention a number, time or email the section doesn't contain, are marked unverified.
-  - If nothing is supported, the answer is "Couldn't verify an answer".
-  - When sources disagree, the answer reports both versions.
-- **Two retrieval modes.** *Simple* is BM25 keyword search only. *Full* adds embeddings, fuses both with reciprocal rank fusion and reranks with the cross-encoder. Both modes add a few student-to-document synonyms to the search query (e.g. ChatGPT → "AI-based systems").
-
-The API takes `POST {"question", "mode": "simple"|"full", "scope": "both"|"pc141"|"laurier", "sections": {"lab": "L04", "tutorial": "T02"}, "retrieveOnly": false}`. `GET /meta` lists the documents, the Laurier pages and the section codes.
-
-### Do we need the full pipeline? (measured)
-
-`scripts/eval_web.py` runs the questions in `data/web_eval.json` through both modes:
-- the 19 original questions and the 4 admin questions above;
-- 10 questions on the hand-picked Laurier pages;
-- 6 on other university policies (12.3, 12.5, 9.3, 10.2, 2.5, 12.4), and 4 that only the site search can reach (transcripts, parking, OneCard, the Dean of Science);
-- 5 questions the sources can't answer.
-
-The results are in `results/web_eval.json` and on the site under "How it works".
+All 48 questions are in `data/web_eval.json`: the 19 original questions, 4 admin questions, 10 on the hand-picked Laurier pages, 6 on other policies, 4 that only site search can reach, and 5 the sources can't answer. Full results are in `results/web_eval.json` and on the site under "How it works".
 
 | Check | Simple | Full |
 |---|---|---|
 | PC141 section retrieved (top 5) | 23/23 | 23/23 |
-| Laurier page retrieved | 21/21 | 20/20 |
+| Laurier page retrieved | 21/21 | 21/21 |
 | Answer cites the right PC141 section | 4/4 | 23/23 |
-| Answer cites the right Laurier page | 6/7 | 19/20 |
+| Answer cites the right Laurier page | 6/7 | 20/21 |
 | Says it can't verify (unanswerable questions) | 4/4 | 5/5 |
-| Statements whose quote checks out | 32/32 | 117/119 |
-| Median seconds per answer | 4.9 | 10.3 |
+| Median seconds per answer | 4.9 | ~10 |
 
-The Full answer rows are from 2026-11-05 on `wrangler dev`, with the fixes listed below (not yet deployed). That run used the same models and live wlu.ca pages as the deployed Worker, and covered 47 of the 48 questions. The Dean of Science question hit the Workers AI daily allowance. The Simple answer rows are from an earlier 14-question run, before the policy index and site search. The retrieval rows cover every question in Simple mode, and the PC141 and university-side questions in Full mode.
+Retrieval rows are from the live Worker with the policy index (2026-11-06). The Full answer rows combine the 2026-11-05 run on the PC141 questions with the 2026-11-06 re-run of the 21 university-side questions on the index. The Simple answer rows are from an earlier 14-question run, before the index and site search. In the Full runs, 117 of 119 statement quotes checked out on 2026-11-05 and 65 of 67 on the university side on 2026-11-06; the failures were marked unverified.
 
-With section-level chunks, keyword search alone found the right PC141 section as often as the full pipeline. (With 63 sections, "retrieve 150" already means reranking every section.) The reranker mattered on long Laurier policy pages. Simple's one miss was "What counts as academic misconduct at Laurier?", where it said it couldn't verify an answer rather than guessing. So starting simple works for the course documents; reranking is worth keeping for university pages. The site defaults to Full, and either mode can be picked per question.
+What this showed:
 
-An earlier Full run against the deployed Worker, the same day, covered 41 questions. It got three wrong, and each has a fix:
+- **Keyword search is enough for the course documents.** With 63 section-level chunks, BM25 found the right PC141 section as often as the full pipeline.
+- **Ranking matters for university pages.** On long policy pages, Simple's one miss was "What counts as academic misconduct at Laurier?". It said it couldn't verify an answer rather than guessing.
+- **For the policy index alone, hybrid search beat reranking.** On the 17 questions whose pages are in the index, hybrid keyword + vector search ranked the expected page first 17/17 times (MRR 1.00), keyword only 15/17, and adding the local reranker 14/17. Details are in [policy_index/README.md](policy_index/README.md).
 
-- *How do I request a deferred final exam?* cited the Accessible Learning Centre's exam-booking page, which site search found, and gave its steps (the ALC Deferred Exam Form) as if they applied to every student.
-  - Fix: pages found by site search now carry their part of the site in the source label, and the prompt asks the model to say who a rule is for.
-  - Re-run: the answer now gives the general deadlines first and says the ALC steps are for students registered with Accessible Learning.
-- *What counts as academic misconduct at Laurier?* was only partly verified. Every section of Policy 12.2 says "academic misconduct", so keyword ranking picked its Purpose section (which says "Laurier") over its definitions.
-  - Fix: "Laurier", "WLU" and "Wilfrid" are now ignored in searches, and "counts as" / "means" / "considered" also search for definitions. This also stops the lab manual's "parking spaces at Laurier" example from turning up as a PC141 source for university questions.
-  - Re-run: fully verified.
-- *How do I get a parking permit on the Waterloo campus?* said it couldn't verify an answer. The parking page puts each campus in a tab, and the parser didn't keep the tabs apart, so Brantford's text appeared under a Waterloo heading.
-  - Fix: the campus is now part of each section's name.
-  - Re-run: still "couldn't verify", which is correct. No public page found says how a student gets a Waterloo permit. The student page's Waterloo tab only says permits are required, and wlu.ca's Waterloo parking page is for visitors.
+The evaluation runs led to concrete fixes, all recorded in the commit history. Campus tabs are now kept apart, site-search pages are labelled with their part of the site, "Laurier" is ignored as a search term, the verifier no longer reads "one's own" as the number 1, and dated news posts are no longer used as sources.
 
-Other changes after that run:
+## Running it
 
-- The verifier read "one's own" as the number 1 and rejected an exact quote. It no longer does.
-- The first-offence penalty question was re-scored as correct. It cites section 5.0 of the official *Procedures for Student Code of Conduct*, which the expected pages didn't list.
-- "Who is the Dean of Science?" moved from the unanswerable group to site search. Site search now finds the answer on wlu.ca.
+### Web assistant (Worker + page)
 
-Two of the 119 statements in the Full run had quotes that didn't check out, and both were marked unverified:
-- **L6:** the model fixed a typo in the source ("occassional") while quoting it.
-- **L9:** the model claimed two deadlines conflict without giving a quote, although they cover different situations.
-
-Caveats:
-
-- **Daily capacity.** The Workers AI free plan gives the account 10,000 neurons a day, shared by every user and by evaluation runs. Cloudflare's usage analytics count about 120 neurons per answer, nearly all of it Llama 3.3 70B. In practice, though, the allowance ran out at about 15:15 UTC on 2026-11-05 after 41 answers, when the analytics showed only about 5,100 neurons. It was back by 21:10 UTC, ran out again after 49 more answers, and on 2026-11-04 it ran out near 10,000. So neither the dashboard nor the documented 00:00 UTC reset is a reliable guide. Expect roughly 40 to 50 answers at a time across all users on the free plan. After that the Worker returns 429, and the page asks students to try again in a few hours. Workers Paid removes the cap and charges $0.011 per 1,000 neurons above the free allowance. A full 48-question answer run can use the whole allowance, so split evaluations with `--ids` and `--merge`.
-- **Groq for answers, Workers AI kept for retrieval.** With the `GROQ_API_KEY` secret set (`npx wrangler secret put GROQ_API_KEY`), answers can also be written by `llama-3.3-70b-versatile` on Groq (`worker/src/llm.js`; the `GROQ_MODEL` var picks another Groq model). The Workers AI allowance is shared by every model, and Llama spends about 120 neurons an answer against a fraction of a neuron for a retrieval. Once Llama had used it up, the query embedding failed too and Full mode was left with keyword search. So Workers AI now writes only the first `WORKERS_AI_DAILY_ANSWERS` answers of each UTC day (default 25, counted in the D1 table `ai_usage`), and Groq writes the rest. The rest of the allowance then keeps vector search and the reranker running. Each provider backs up the other: past the budget, Workers AI still answers when Groq is rate-limited, and error 4006 from Workers AI sends the answer to Groq. Full mode never falls back to keyword-only retrieval. If Workers AI is out anyway, the Worker returns 429 and the page asks students to try again later. Groq's Llama 3.3 has JSON mode but no schema-constrained output, so the schema is written into its prompt and `verifyAnswer` checks the result as usual. Each response's `llm` field names the provider (`budgetReached: true` when the budget sent it to Groq). Groq's free tier allows about 100,000 tokens a day for this model, roughly 20 to 30 answers.
-- **Answer cache.** Answers are cached for 24 hours (`worker/src/cache.js`), keyed on the question (ignoring case, spacing and trailing punctuation), mode, scope and sections. Repeats cost no embedding, rerank or LLM calls. The cache is a table `answer_cache` in the `wlu-policies` D1 database, created on first use, with a small in-memory copy per isolate; identical questions asked at the same moment also share one answer. Answers with a Laurier page unavailable are kept for 2 hours, so a complete answer replaces them. Cached responses carry `cached: true` and `cachedAt`. Send `"cache": false` to skip the cached answer (`scripts/eval_web.py` does this unless given `--use-cache`), and bump `CACHE_VERSION` when retrieval or the prompt changes. `retrieveOnly` requests are never cached.
-- After deploying, all 48 questions were re-run against the live Worker in Simple retrieval mode: 122 wlu.ca page loads, 53 of them found through site search, with no errors. Two answers were also checked end to end on the live site: the L04 lab time and ordering a transcript.
-- The quote check confirms the wording exists in the source. It can't catch every overstatement, so each statement shows its quote for students to compare.
-- The PC141 documents contradict each other in places. The syllabus says labs run every week, begin the week of May 4 and are in room 2089; the lab announcement says alternate weeks from September 16 in room N2089.
-- Pages behind a Laurier sign-in (Laurier Connect, MyLearningSpace) and the contents of PDF and Word forms are out of reach. Questions that need them get "Couldn't verify".
+Requires Node 22.13+ and a Cloudflare account (`npx wrangler login`).
 
 ```bash
-.venv\Scripts\python scripts/export_chunks.py   # split files/*.pdf into worker/src/chunks.json
-python scripts/embed_chunks.py                   # precompute worker/src/vectors.json (needs wrangler login)
-node scripts/build_policy_index.mjs              # refresh worker/src/policies.json from the wlu.ca sitemap
-cd worker && npm test                            # parser, retrieval and verification tests
-cd worker && npx wrangler dev                    # local API on :8787 (serve docs/ on :8000 to use it)
-python scripts/eval_web.py --url http://127.0.0.1:8787
-python scripts/eval_web.py --modes full --ids S3,U1 --merge   # re-run some questions against the live Worker, keep the rest
-cd worker && npx wrangler deploy                 # redeploy the API
+cd worker && npm test                     # parser, retrieval, verification, LLM-routing and cache tests
+cd worker && npx wrangler dev             # local API on :8787, using the real D1 database and Vectorize index
+python -m http.server 8000 -d docs        # the page; on localhost it calls the local API
+cd worker && npx wrangler deploy          # deploy the API
 ```
 
-The Worker only accepts browser requests from the Pages origin (`ALLOWED_ORIGIN` in `worker/wrangler.jsonc`) and from localhost:8000. The Python CLI still uses Gemma through the Gemini API with page-level chunks; the web demo uses different models and section-level chunks, so its answers can differ.
+Configuration (`worker/wrangler.jsonc` and secrets):
 
-## Policy index: every Laurier policy, by section
+| Setting | Purpose |
+|---|---|
+| `POLICY_DB`, `POLICY_INDEX` | D1 database and Vectorize index `wlu-policies`. Remove both to fall back to fetching catalog pages live |
+| `ALLOWED_ORIGIN` | The frontend origin allowed to call the API |
+| `SITE_SEARCH` | `"on"` / `"off"` for wlu.ca site search |
+| `GROQ_API_KEY` (secret) | Enables Groq answers: `npx wrangler secret put GROQ_API_KEY`. Stray BOMs and line breaks from a Windows shell are stripped |
+| `GROQ_MODEL`, `WORKERS_AI_DAILY_ANSWERS` | Groq model and the daily Workers AI answer budget (default 25) |
 
-`policy_index/` is a vector index of all 183 Laurier policy, procedure, Academic Calendar and student pages, split into 2,390 citable sections. A weekly job (`.github/workflows/policy-index.yml`) re-checks wlu.ca and re-embeds only the sections that changed.
+The frontend deploys automatically when `docs/` changes on `main`.
 
-Since 2026-11-06 the deployed Worker reads those pages from the index: its D1 database `wlu-policies` (rows and FTS5 keyword index) and Vectorize index `wlu-policies` are bound as `POLICY_DB` and `POLICY_INDEX` in `worker/wrangler.jsonc`. Simple mode searches the index by keyword, and Full mode adds vector search. Site search still covers pages outside the index, and if the index fails the Worker falls back to fetching pages live. The same Worker serves the index to agents, with no LLM calls:
-- `POST /mcp`: MCP tools `search_policies`, `get_policy_section` and `list_policies`;
-- `POST /policy-search {"query"}`.
+### Rebuilding data and evaluating
 
-When the Workers AI allowance is used up, both still answer from keyword search. `python scripts/ai_budget.py` uses that to check, for a fraction of a neuron, whether the allowance is back. Each result cites one section (*12.2 Student Code of Conduct: Academic Misconduct > 4.04 Penalties for Academic Misconduct, 4.04.01*) with a link that scrolls to it. See [policy_index/README.md](policy_index/README.md) for the design and measurements, and [policy_index/HOSTING.md](policy_index/HOSTING.md) for the comparison of free vector-database hosts.
+```bash
+python scripts/export_chunks.py               # files/*.pdf → worker/src/chunks.json
+python scripts/embed_chunks.py                # worker/src/vectors.json (needs wrangler login)
+node scripts/build_policy_index.mjs           # refresh worker/src/policies.json from the wlu.ca sitemap
+python scripts/eval_web.py --url http://127.0.0.1:8787
+python scripts/eval_web.py --modes full --ids S3,U1 --merge   # re-run some questions, keep the rest
+python scripts/ai_budget.py                   # check cheaply whether the Workers AI allowance is back
+```
+
+`eval_web.py` skips the answer cache unless given `--use-cache`. A full 48-question answer run can use the whole daily allowance, so split runs with `--ids` and `--merge`.
+
+### Policy index
+
+```bash
+cd policy_index && npm install
+node src/cli.mjs sync                # build/update a local SQLite index (~5 min the first time)
+node src/cli.mjs search "What is the penalty for a first plagiarism offence?"
+node src/cli.mjs serve               # HTTP + MCP on http://127.0.0.1:8790
+node src/cli.mjs sync --store cloudflare   # update the deployed D1 + Vectorize index
+```
+
+`.github/workflows/policy-index.yml` runs the sync every Monday. It re-embeds only sections whose text changed, deletes removed sections and pages, and refuses to delete more than 20% of pages in one run unless forced. It needs the secrets `CLOUDFLARE_ACCOUNT_ID` and `POLICY_INDEX_API_TOKEN` and the variable `D1_DATABASE_ID`; without them it maintains a SQLite index as a build artifact instead. See [policy_index/README.md](policy_index/README.md) for setup, design and measurements.
+
+### Original Python prototype
+
+Requires Python 3.10+ (tested on 3.12) and a Gemini API key in `.env` (`GEMINI_API_KEY=...`).
+
+```bash
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt     # .venv/bin/pip on macOS/Linux
+python -m rag_prototype ask "Can I use my phone in the lab?" --show-sources
+python -m rag_prototype index                     # index new/changed PDFs in files/
+python -m rag_prototype eval                      # writes results/eval_results.json
+python -m rag_prototype run                       # index + demo question + eval
+```
+
+It chunks each PDF page, has Gemma (`gemma-4-31b-it`, with `gemma-4-26b-a4b-it` as fallback) write a description of each chunk, indexes the chunks with MiniLM embeddings in Qdrant plus BM25, fuses and reranks them with a cross-encoder, and answers from the top 5 with `[Cite: file, Page: n]`. It found the correct PDF in the top 5 for 19/19 questions.
+
+Indexing is incremental. PDFs are identified by SHA-256, Gemma's descriptions are saved after each call so an interrupted run resumes, and the committed `.rag_cache/` lets a fresh clone answer straight away. Delete `.rag_cache/` to rebuild from scratch. Its page numbers are PDF positions, not printed page numbers. Because it uses different models and page-level chunks, its answers can differ from the web assistant's.
+
+## Known limitations
+
+- **Daily capacity.** On free tiers, expect a few dozen fresh answers a day across all users (Workers AI plus Groq); cached repeats are free. Workers Paid removes the Workers AI cap at $0.011 per 1,000 neurons.
+- **The PC141 documents contradict each other.** The syllabus says labs run weekly from the week of May 4 in room 2089. The lab announcement says alternate weeks from September 16 in room N2089. The assistant reports both.
+- **Sign-in pages are out of reach.** Laurier Connect, MyLearningSpace and the contents of PDF and Word forms can't be read, so questions that need them get "Couldn't verify".
+- **Some questions have no public answer.** For example, no public page says how a student gets a Waterloo parking permit, so the assistant correctly says it can't verify one.
+- **Short PC141 embeddings are slightly off.** Workers AI pads batched embeddings, so the short chunks in `worker/src/vectors.json`, embedded in batches of 8, are at cosine 0.92–0.97 from their true vectors. Re-embedding one chunk per call would fix this. The policy index already embeds that way.
+- **Some things haven't been run.** The policy index's Docker image and the scheduled GitHub Actions sync have not been tested.

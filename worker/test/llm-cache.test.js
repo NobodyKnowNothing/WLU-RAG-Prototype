@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, test } from "node:test";
 import { answerCache, cacheKey, clearMemory, normalizeQuestion } from "../src/cache.js";
-import { DEFAULT_DAILY_ANSWERS, GROQ_MODEL, WORKERS_AI_MODEL, complete, dailyAnswerBudget, parseAnswer, resetUsage, resetWorkersAiState, skipWorkersAi, usageCounter } from "../src/llm.js";
+import { cleanKey, DEFAULT_DAILY_ANSWERS, GROQ_MODEL, groqRequest, WORKERS_AI_MODEL, complete, dailyAnswerBudget, parseAnswer, resetUsage, resetWorkersAiState, skipWorkersAi, usageCounter } from "../src/llm.js";
 
 const ANSWER = { status: "answered", pc141: [], laurier: [], unverified: "" };
 const PROMPT = { system: "sys", user: "question" };
@@ -38,7 +38,8 @@ test("a used-up Workers AI allowance switches to Groq without retrying, then ski
   assert.equal(env.AI.calls, 1, "no retry once the allowance is gone");
   assert.equal(fetchImpl.last.url, "https://api.groq.com/openai/v1/chat/completions");
   assert.equal(fetchImpl.last.auth, "Bearer test-key");
-  assert.equal(fetchImpl.last.body.response_format.type, "json_object");
+  assert.equal(fetchImpl.last.body.model, "openai/gpt-oss-120b");
+  assert.equal(fetchImpl.last.body.response_format.type, "json_schema");
   assert.match(fetchImpl.last.body.messages[0].content, /JSON object/);
 
   assert.ok(skipWorkersAi(env));
@@ -106,6 +107,37 @@ test("the daily answer count is shared through D1 and starts again each UTC day"
   resetUsage(); // another isolate
   assert.equal(await usageCounter(db).today(day1), 2);
   assert.equal(await usageCounter(db).today(day1 + 2 * 3600_000), 0);
+});
+
+test("stray BOM, spaces and line breaks are stripped from the Groq key", async () => {
+  assert.equal(cleanKey("\ufeffgsk_abc123\r\n"), "gsk_abc123");
+  const env = { AI: ai(async () => Promise.reject(quotaError())), GROQ_API_KEY: " gsk_abc123\n" };
+  const fetchImpl = groqOk();
+  await complete(env, PROMPT, { fetchImpl });
+  assert.equal(fetchImpl.last.auth, "Bearer gsk_abc123");
+});
+
+test("GPT-OSS gets the strict answer schema and room to reason; other Groq models get JSON mode", () => {
+  const oss = groqRequest("openai/gpt-oss-120b", "sys", "q");
+  const { schema, strict } = oss.response_format.json_schema;
+  assert.equal(strict, true);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.pc141.items.additionalProperties, false);
+  assert.deepEqual(schema.required, ["status", "pc141", "laurier", "unverified"]);
+  assert.equal(oss.reasoning_effort, "low");
+  assert.ok(oss.max_tokens >= 4096);
+  const llama = groqRequest("llama-3.3-70b-versatile", "sys", "q");
+  assert.deepEqual(llama.response_format, { type: "json_object" });
+  assert.equal(llama.reasoning_effort, undefined);
+  assert.match(llama.messages[0].content, /JSON object/);
+});
+
+test("Groq 4xx errors such as an unknown model are not retried", async () => {
+  const env = { AI: ai(async () => Promise.reject(quotaError())), GROQ_API_KEY: "test-key" };
+  let calls = 0;
+  const fetchImpl = async () => (calls++, new Response('{"error":{"code":"model_not_found"}}', { status: 404 }));
+  await assert.rejects(complete(env, PROMPT, { fetchImpl }), /Groq: HTTP 404/);
+  assert.equal(calls, 1);
 });
 
 test("model output is parsed from objects, strings and fenced JSON", () => {
