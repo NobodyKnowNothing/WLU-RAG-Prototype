@@ -36,6 +36,14 @@
   .seg button { border:0; background:var(--bg); color:var(--fg); padding:4px 10px; font-size:.85rem; }
   .seg button + button { border-left:1px solid var(--line); }
   .seg button[aria-pressed=true] { background:var(--accent); color:var(--accent-fg); }
+  .opts-toggle { border:0; background:none; color:var(--muted); padding:4px 2px; font-size:.88rem; }
+  .opts-toggle:hover { color:var(--fg); }
+  .opts-toggle .chev { display:inline-block; transition:transform .15s; }
+  .opts-toggle[aria-expanded=true] .chev { transform:rotate(90deg); }
+  .opts-hint { color:var(--accent); font-weight:600; }
+  .opts-hint:not(:empty)::before { content:" · "; color:var(--muted); font-weight:400; }
+  .controls.opts { margin-top:8px; padding:10px 12px; background:var(--card); border:1px solid var(--line); border-radius:8px; }
+  .controls.opts[hidden] { display:none; }
   .examples { margin:14px 0 0; display:flex; flex-wrap:wrap; gap:6px; }
   .examples button { font-size:.85rem; padding:4px 10px; color:var(--fg); background:var(--card); border:1px solid var(--line); border-radius:999px; }
   #out { margin-top:28px; }
@@ -98,11 +106,16 @@
     <button id="go" type="submit">Ask</button>
   </form>
   <div class="controls">
-    <label>Lab section <select id="lab"><option value="">Not set</option></select></label>
-    <label>Tutorial <select id="tut"><option value="">Not set</option></select></label>
     <span>Search <span class="seg" id="scope" role="group" aria-label="Sources to search">
       <button type="button" data-v="both">PC141 + Laurier</button><button type="button" data-v="pc141">PC141 only</button><button type="button" data-v="laurier">Laurier only</button>
     </span></span>
+    <button type="button" id="opts-toggle" class="opts-toggle" aria-expanded="false" aria-controls="opts">
+      <span class="chev" aria-hidden="true">▸</span> Options<span id="opts-hint" class="opts-hint"></span>
+    </button>
+  </div>
+  <div class="controls opts" id="opts" hidden>
+    <label>Lab section <select id="lab"><option value="">Not set</option></select></label>
+    <label>Tutorial <select id="tut"><option value="">Not set</option></select></label>
     <span>Retrieval <span class="seg" id="mode" role="group" aria-label="Retrieval pipeline">
       <button type="button" data-v="full" title="BM25 + embeddings, fused and reranked">Full</button><button type="button" data-v="simple" title="Keyword (BM25) search only">Simple</button>
     </span></span>
@@ -139,9 +152,23 @@
     return e;
   }
 
+  // Lab, tutorial and retrieval sit in a collapsed panel; the toggle shows any non-default values so they aren't forgotten.
+  const optsToggle = $("opts-toggle"), opts = $("opts");
+  function setOptsOpen(open) {
+    opts.hidden = !open;
+    optsToggle.setAttribute("aria-expanded", String(open));
+    store.set("pc141.optsOpen", open ? "1" : "");
+  }
+  optsToggle.onclick = () => setOptsOpen(opts.hidden);
+  setOptsOpen(store.get("pc141.optsOpen") === "1");
+  function updateOptsHint() {
+    const mode = [...$("mode").children].find((b) => b.getAttribute("aria-pressed") === "true")?.dataset.v;
+    $("opts-hint").textContent = [$("lab").value, $("tut").value, mode === "simple" && "Simple retrieval"].filter(Boolean).join(", ");
+  }
+
   function segmented(id, key, fallback) {
     const group = $(id);
-    const set = (v) => { for (const b of group.children) b.setAttribute("aria-pressed", String(b.dataset.v === v)); store.set(key, v); };
+    const set = (v) => { for (const b of group.children) b.setAttribute("aria-pressed", String(b.dataset.v === v)); store.set(key, v); updateOptsHint(); };
     for (const b of group.children) b.onclick = () => set(b.dataset.v);
     set(store.get(key) || fallback);
     return () => [...group.children].find((b) => b.getAttribute("aria-pressed") === "true").dataset.v;
@@ -154,8 +181,9 @@
       const sel = $(id);
       for (const c of list) sel.append(el("option", { value: c, textContent: c }));
       sel.value = store.get(`pc141.${id}`) || "";
-      sel.onchange = () => store.set(`pc141.${id}`, sel.value);
+      sel.onchange = () => { store.set(`pc141.${id}`, sel.value); updateOptsHint(); };
     }
+    updateOptsHint();
   }
   // Section codes come from the course documents; the fallback keeps the page usable if /meta is down.
   fetch(`${API_URL}/meta`).then((r) => r.json()).then((m) => fillSections(m.sectionCodes))
